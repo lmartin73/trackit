@@ -3,8 +3,13 @@ import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {syncHistoryWithStore} from 'react-router-redux'
 import {Router, hashHistory} from 'react-router'
+import * as firebase from 'firebase'
+import {FIRconfig} from './config/firebaseConfig' // import firebase config details
+
+
 
 import store from './store/configureStore'
+
 
 const history = syncHistoryWithStore(hashHistory, store);
 
@@ -28,11 +33,14 @@ const routes = {
     require('./routes/calendar').default,
     require('./routes/forms').default,
 
-
     // comment unused routes
     // this will speed up builds
   ]
 };
+
+//initialize firebase
+firebase.initializeApp(FIRconfig.config);
+
 
 ReactDOM.render((
   <Provider store={store}>
