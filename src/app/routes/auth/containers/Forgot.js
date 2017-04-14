@@ -8,9 +8,6 @@ export default class Forgot extends React.Component {
 
     constructor() {
         super();
-        // Initialize variable for forgot password action method to keep form as a controlled component
-        this.displayForm = this.displayForm();
-
         this.validationOptions = {
             // Rules for password recovery form validation
             rules: {
@@ -80,7 +77,7 @@ export default class Forgot extends React.Component {
                             <DisplayContent />
                             <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
                                 <div className="well no-padding">
-                                    {this.displayForm}
+                                    {this.displayForm()}
                                 </div>
                                 <Footer />
                             </div>

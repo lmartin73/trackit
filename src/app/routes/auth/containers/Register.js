@@ -13,8 +13,6 @@ export default class Register extends React.Component {
     constructor() {
         super();
         // Initialize variable for register action method to keep form as a controlled component
-        this.displayForm = this.displayForm();
-        this.displayTerms = this.displayTerms();
         this.validationOptions = {
             // Rules for registration form validation
             rules: {
@@ -158,14 +156,14 @@ export default class Register extends React.Component {
                             <DisplayContent />
                             <div className="col-xs-12 col-sm-12 col-md-5 col-lg-5">
                                 <div className="well no-padding">
-                                    {this.displayForm}
+                                    {this.displayForm()}
                                 </div>
                                 <Footer />
                             </div>
                         </div>
                     </div>
                 </div>
-                {this.displayTerms}
+                {this.displayTerms()}
             </div>
         )
     }

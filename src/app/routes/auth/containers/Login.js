@@ -9,7 +9,6 @@ export default class Login extends React.Component {
 
     constructor(props) {
         super(props);
-        this.displayForm = this.displayForm();
         this.validationOptions = {
             // Rules for login form validation
             rules: {
@@ -34,7 +33,6 @@ export default class Login extends React.Component {
             },
             submitHandler: function(form) {
                 // Todo: Log in user here
-                console.log("MAde it.");
 
             }.bind(this)
         };
@@ -98,7 +96,7 @@ export default class Login extends React.Component {
                             <DisplayContent />
                             <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
                                 <div className="well no-padding">
-                                    {this.displayForm}
+                                    {this.displayForm()}
                                 </div>
                                 <Footer />
                             </div>
