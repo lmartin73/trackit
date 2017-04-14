@@ -24,7 +24,7 @@ export default class LockedScreen extends React.Component {
             },
             submitHandler: function(form) {
                 // Todo: Check password here
-                
+
             }.bind(this)
         };
     }
