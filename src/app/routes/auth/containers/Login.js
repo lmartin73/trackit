@@ -4,55 +4,45 @@ import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
-const validationOptions = {
-    // Rules for login form validation
-    rules: {
-        email: {
-            required: true,
-            email: true
-        },
-        password: {
-            required: true,
-            minlength: 8
-        },
-    },
-    // Messages for login form validation
-    messages: {
-        email: {
-            required: 'Email Required',
-            email: 'Invalid Email Address'
-        },
-        password: {
-            required: 'Password Required'
-        },
-    }
-};
 
 export default class Login extends React.Component {
 
     constructor() {
         super();
-        // Initialize variable for sign in action method to keep form as a controlled component
-        this.submitForm = this.signInAction.bind(this);
-        this.displayForm = this.loginForm();
+        this.displayForm = this.displayForm();
+        this.validationOptions = {
+            // Rules for login form validation
+            rules: {
+                email: {
+                    required: true,
+                    email: true
+                },
+                password: {
+                    required: true,
+                    minlength: 8
+                },
+            },
+            // Messages for login form validation
+            messages: {
+                email: {
+                    required: 'Email Required',
+                    email: 'Invalid Email Address'
+                },
+                password: {
+                    required: 'Password Required'
+                },
+            },
+            submitHandler: function(form) {
+                // Todo: Log in user here
+
+            }.bind(this)
+        };
     }
 
-    signInAction(event) {
-        event.preventDefault();
-
-        const formValid = this.refs.email.value.length != 0 && this.refs.email.validity.valid &&
-                          this.refs.password.value.length >= 8;
-        if (formValid) {
-            // Todo: Sign in user here
-            // email -> this.email.value
-            // password -> this.password.value
-        }
-    }
-
-    loginForm() {
+    displayForm() {
         return(
-            <UiValidate options={validationOptions}>
-                <form id="login-form" onSubmit={this.submitForm} className="smart-form client-form">
+            <UiValidate options={this.validationOptions}>
+                <form id="form" className="smart-form client-form">
                     <header>Sign In</header>
                     <fieldset>
                         <section>

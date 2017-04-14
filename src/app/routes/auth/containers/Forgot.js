@@ -4,46 +4,39 @@ import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
-const validationOptions = {
-    // Rules for password recovery form validation
-    rules: {
-        email: {
-            required: true,
-            email: true
-        }
-    },
-    // Messages for password recovery form validation
-    messages: {
-        email: {
-            required: 'Email Required',
-            email: 'Invalid Email Address'
-        }
-    }
-};
-
 export default class Forgot extends React.Component {
 
     constructor() {
         super();
         // Initialize variable for forgot password action method to keep form as a controlled component
-        this.submitForm = this.forgotPasswordAction.bind(this);
-        this.displayForm = this.passwordRecoveryForm();
+        this.displayForm = this.displayForm();
+
+        this.validationOptions = {
+            // Rules for password recovery form validation
+            rules: {
+                email: {
+                    required: true,
+                    email: true
+                }
+            },
+            // Messages for password recovery form validation
+            messages: {
+                email: {
+                    required: 'Email Required',
+                    email: 'Invalid Email Address'
+                }
+            },
+            submitHandler: function(form) {
+                // Todo: Send recovery email here
+
+            }.bind(this)
+        };
     }
 
-    forgotPasswordAction(event) {
-        event.preventDefault();
-
-        const formValid = this.refs.email.value.length > 0 && this.refs.email.validity.valid;
-        if (formValid) {
-            // Todo: Send password recovery email here
-            // email value -> this.email.value
-        }
-    }
-
-    passwordRecoveryForm() {
+    displayForm() {
         return(
             <UiValidate options={validationOptions}>
-                <form id="login-form" onSubmit={this.submitForm} className="smart-form client-form">
+                <form id="login-form" className="smart-form client-form">
                     <header>Forgot Password</header>
                     <fieldset>
                         <section>

@@ -8,77 +8,66 @@ import Footer from '../components/Footer'
 // Terms and agreement information
 const terms = require('html-loader!./TermsAndConditions.html');
 
-const validationOptions = {
-    // Rules for registration form validation
-    rules: {
-        firstname: {
-            required: true
-        },
-        lastname: {
-            required: true
-        },
-        email: {
-            required: true,
-            email: true
-        },
-        password: {
-            required: true,
-            minlength: 8
-        },
-        passwordConfirm: {
-            required: true,
-            minlength: 8,
-            equalTo: '#password'
-        }
-    },
-    // Messages for registration form validation
-    messages: {
-        firstname: {
-            required: 'First Name Required'
-        },
-        lastname: {
-            required: 'Last Name Required'
-        },
-        email: {
-            required: 'Email Required',
-            email: 'Invalid Email Address'
-        },
-        password: {
-            required: 'Password Required'
-        },
-        passwordConfirm: {
-            required: 'Password Required',
-            equalTo: 'Invalid Password Match'
-        }
-    }
-};
-
 export default class Register extends React.Component {
 
     constructor() {
         super();
         // Initialize variable for register action method to keep form as a controlled component
-        this.submitForm = this.createAccountAction.bind(this);
-        this.displayForm = this.registrationForm();
-        this.displayTerms = this.termsModalView();
+        this.displayForm = this.displayForm();
+        this.displayTerms = this.displayTerms();
+        this.validationOptions = {
+            // Rules for registration form validation
+            rules: {
+                firstname: {
+                    required: true
+                },
+                lastname: {
+                    required: true
+                },
+                email: {
+                    required: true,
+                    email: true
+                },
+                password: {
+                    required: true,
+                    minlength: 8
+                },
+                passwordConfirm: {
+                    required: true,
+                    minlength: 8,
+                    equalTo: '#password'
+                }
+            },
+            // Messages for registration form validation
+            messages: {
+                firstname: {
+                    required: 'First Name Required'
+                },
+                lastname: {
+                    required: 'Last Name Required'
+                },
+                email: {
+                    required: 'Email Required',
+                    email: 'Invalid Email Address'
+                },
+                password: {
+                    required: 'Password Required'
+                },
+                passwordConfirm: {
+                    required: 'Password Required',
+                    equalTo: 'Invalid Password Match'
+                }
+            },
+            submitHandler: function(form) {
+                // Todo: Register user here
+            }.bind(this)
+        };
     }
 
-    createAccountAction(event) {
-        event.preventDefault();
-
-        const formValid = this.refs.firstname.value.length > 0 && this.refs.lastname.value.length > 0 &&
-                          this.refs.email.value.length > 0 && this.refs.email.validity.valid &&
-                          this.refs.password.value.length >= 8 && this.refs.passwordConfirm.value == this.password.value;
-        if (formValid) {
-            // Todo: Register user here
-            // formField values -> this.formFieldName.value
-        }
-    }
-
-    registrationForm() {
+    displayForm() {
         return(
-            <UiValidate options={validationOptions}>
-                <form id="smart-form-register" onSubmit={this.submitForm} className="smart-form client-form">
+            <UiValidate options={this.validationOptions}>
+                <form id="smart-form-register" className="smart-form client-form">
                     <fieldset>
                         <section>
                             <label className="input"> <i className="icon-append fa fa-user"/>
@@ -122,7 +111,7 @@ export default class Register extends React.Component {
         )
     }
 
-    termsModalView() {
+    displayTerms() {
         return(
             <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
                 <div className="modal-dialog">
