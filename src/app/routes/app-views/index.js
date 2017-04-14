@@ -19,10 +19,8 @@ export default {
     {
       path: 'profile',
       getComponent(nextState, cb){
-        System.import('html-loader?-attrs!./content/profile.html').then((html)=> {
-          cb(null,
-            () => (<HtmlRender html={html}/>)
-          )
+        System.import('./content/profile.js').then((m)=> {
+          cb(null, m.default)
         })
       }
     },
