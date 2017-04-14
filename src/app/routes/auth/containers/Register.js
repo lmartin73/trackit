@@ -1,211 +1,183 @@
 import React from 'react'
-
+import ReactDOM from 'react-dom';
 import HtmlRender from '../../../components/utils/HtmlRender'
 import UiValidate from '../../../components/forms/validation/UiValidate'
+import DisplayContent from '../components/DisplayContent'
+import Footer from '../components/Footer'
 
+// Terms and agreement information
 const terms = require('html-loader!./TermsAndConditions.html');
 
+const validationOptions = {
+    // Rules for registration form validation
+    rules: {
+        firstname: {
+            required: true
+        },
+        lastname: {
+            required: true
+        },
+        email: {
+            required: true,
+            email: true
+        },
+        password: {
+            required: true,
+            minlength: 8
+        },
+        passwordConfirm: {
+            required: true,
+            minlength: 8,
+            equalTo: '#password'
+        }
+    },
+    // Messages for registration form validation
+    messages: {
+        firstname: {
+            required: 'First Name Required'
+        },
+        lastname: {
+            required: 'Last Name Required'
+        },
+        email: {
+            required: 'Email Required',
+            email: 'Invalid Email Address'
+        },
+        password: {
+            required: 'Password Required'
+        },
+        passwordConfirm: {
+            required: 'Password Required',
+            equalTo: 'Invalid Password Match'
+        }
+    }
+};
+
 export default class Register extends React.Component {
-  render() {
-    return (
-      <div id="extr-page">
-        <header id="header" className="animated fadeInDown">
 
-          <div id="logo-group">
-            <span id="logo"> <img src="assets/img/logo.png" alt="SmartAdmin"/> </span>
-          </div>
+    constructor() {
+        super();
+        // Initialize variable for register action method to keep form as a controlled component
+        this.submitForm = this.createAccountAction.bind(this);
+        this.displayForm = this.registrationForm();
+        this.displayTerms = this.termsModalView();
+    }
 
-          <span id="extr-page-header-space">
-        <span className="hidden-mobile hiddex-xs">Already registered?</span>&nbsp;<a href="#login"
-                                                                                     className="btn btn-danger">Sign In</a> </span>
+    createAccountAction(event) {
+        event.preventDefault();
 
-        </header>
-        <div id="main" role="main" className="animated fadeInDown">
+        const formValid = this.refs.firstname.value.length > 0 && this.refs.lastname.value.length > 0 &&
+                          this.refs.email.value.length > 0 && this.refs.email.validity.valid &&
+                          this.refs.password.value.length >= 8 && this.refs.passwordConfirm.value == this.password.value;
+        if (formValid) {
+            // Todo: Register user here
+            // formField values -> this.formFieldName.value
+        }
+    }
 
-          {/* MAIN CONTENT */}
-          <div id="content" className="container">
-
-            <div className="row">
-              <div className="col-xs-12 col-sm-12 col-md-7 col-lg-7 hidden-xs hidden-sm">
-                <h1 className="txt-color-red login-header-big">SmartAdmin</h1>
-                <div className="hero">
-
-                  <div className="pull-left login-desc-box-l">
-                    <h4 className="paragraph-header">It's Okay to be Smart. Experience the simplicity of SmartAdmin,
-                      everywhere you go!</h4>
-                    <div className="login-app-icons">
-                      <a href="#/dashboard" className="btn btn-danger btn-sm">Frontend Template</a>
-                      <span> </span>
-                      <a href="#/smartadmin/different-versions.html" className="btn btn-danger btn-sm">Find out more</a>
-                    </div>
-                  </div>
-
-                  <img src="assets/img/demo/iphoneview.png" alt="" className="pull-right display-image"
-                       style={{width: '210px'}}/>
-
-                </div>
-
-                <div className="row">
-                  <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                    <h5 className="about-heading">About SmartAdmin - Are you up to date?</h5>
-                    <p>
-                      Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
-                      totam rem aperiam, eaque ipsa.
-                    </p>
-                  </div>
-                  <div className="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                    <h5 className="about-heading">Not just your average template!</h5>
-                    <p>
-                      Et harum quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta nobis est
-                      eligendi voluptatem accusantium!
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-              <div className="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-                <div className="well no-padding">
-
-                  <form action="#/dashboard" id="smart-form-register" className="smart-form client-form">
-                    <header>
-                      Registration is FREE*
-                    </header>
-
+    registrationForm() {
+        return(
+            <UiValidate options={validationOptions}>
+                <form id="smart-form-register" onSubmit={this.submitForm} className="smart-form client-form">
                     <fieldset>
-                      <section>
-                        <label className="input"> <i className="icon-append fa fa-user"/>
-                          <input type="text" name="username" placeholder="Username"/>
-                          <b className="tooltip tooltip-bottom-right">Needed to enter the website</b> </label>
-                      </section>
-
-                      <section>
-                        <label className="input"> <i className="icon-append fa fa-envelope"/>
-                          <input type="email" name="email" placeholder="Email address"/>
-                          <b className="tooltip tooltip-bottom-right">Needed to verify your account</b> </label>
-                      </section>
-
-                      <section>
-                        <label className="input"> <i className="icon-append fa fa-lock"/>
-                          <input type="password" name="password" placeholder="Password" id="password"/>
-                          <b className="tooltip tooltip-bottom-right">Don't forget your password</b> </label>
-                      </section>
-
-                      <section>
-                        <label className="input"> <i className="icon-append fa fa-lock"/>
-                          <input type="password" name="passwordConfirm" placeholder="Confirm password"/>
-                          <b className="tooltip tooltip-bottom-right">Don't forget your password</b> </label>
-                      </section>
+                        <section>
+                            <label className="input"> <i className="icon-append fa fa-user"/>
+                            <input type="text" name="firstname" ref="firstname" placeholder="First Name" />
+                            <b className="tooltip tooltip-bottom-right">Please enter your first name.</b> </label>
+                        </section>
+                        <section>
+                            <label className="input"> <i className="icon-append fa fa-user"/>
+                            <input type="text" name="lastname" ref="lastname" placeholder="Last Name" />
+                            <b className="tooltip tooltip-bottom-right">Please enter your last name.</b> </label>
+                        </section>
+                        <section>
+                            <label className="input"> <i className="icon-append fa fa-envelope"/>
+                            <input type="email" name="email" ref="email" placeholder="Email" />
+                            <b className="tooltip tooltip-bottom-right">Please enter your email address.</b> </label>
+                        </section>
+                        <section>
+                            <label className="input"> <i className="icon-append fa fa-lock"/>
+                            <input type="password" name="password" ref="password" placeholder="Password" />
+                            <b className="tooltip tooltip-bottom-right">Please enter your password.</b> </label>
+                        </section>
+                        <section>
+                            <label className="input"> <i className="icon-append fa fa-lock"/>
+                            <input type="password" name="passwordConfirm" ref="passwordConfirm" placeholder="Confirm password" />
+                            <b className="tooltip tooltip-bottom-right">Please confirm your password.</b> </label>
+                        </section>
                     </fieldset>
-
                     <fieldset>
-                      <div className="row">
-                        <section className="col col-6">
-                          <label className="input">
-                            <input type="text" name="firstname" placeholder="First name"/>
-                          </label>
+                        <section>
+                            <label className="checkbox">
+                            <input type="checkbox" name="terms" id="terms" value="off"/>
+                            <i/>I agree with the <a href="#" data-toggle="modal" data-target="#myModal">
+                                Terms and Conditions </a></label>
                         </section>
-                        <section className="col col-6">
-                          <label className="input">
-                            <input type="text" name="lastname" placeholder="Last name"/>
-                          </label>
-                        </section>
-                      </div>
-
-                      <div className="row">
-                        <section className="col col-6">
-                          <label className="select">
-                            <select name="gender" defaultValue={"0"}>
-                              <option value="0" disabled={true}>Gender</option>
-                              <option value="1">Male</option>
-                              <option value="2">Female</option>
-                              <option value="3">Prefer not to answer</option>
-                            </select> <i/> </label>
-                        </section>
-                        <section className="col col-6">
-                          <label className="input"> <i className="icon-append fa fa-calendar"/>
-                            <input type="text" name="request" placeholder="Request activation on" className="datepicker"
-                                   data-dateformat="dd/mm/yy"/>
-                          </label>
-                        </section>
-                      </div>
-
-                      <section>
-                        <label className="checkbox">
-                          <input type="checkbox" name="subscription" id="subscription"/>
-                          <i/>I want to receive news and special offers</label>
-                        <label className="checkbox">
-                          <input type="checkbox" name="terms" id="terms"/>
-                          <i/>I agree with the <a href="#" data-toggle="modal" data-target="#myModal"> Terms and
-                          Conditions </a></label>
-                      </section>
                     </fieldset>
                     <footer>
-                      <a href="#/dashboard" className="btn btn-primary">
-                        Register
-                      </a>
+                        <button type="submit" className="btn btn-primary">Register</button>
                     </footer>
+                </form>
+            </UiValidate>
+        )
+    }
 
-                    <div className="message">
-                      <i className="fa fa-check"/>
-                      <p>
-                        Thank you for your registration!
-                      </p>
+    termsModalView() {
+        return(
+            <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div className="modal-dialog">
+                    <div className="modal-content">
+                        <div className="modal-header">
+                            <button type="button" className="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 className="modal-title" id="myModalLabel">Terms & Conditions</h4>
+                        </div>
+                        <div className="modal-body custom-scroll terms-body">
+                            <HtmlRender html={terms}/>
+                        </div>
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
+                            <button type="button" className="btn btn-primary" id="i-agree">
+                                <i className="fa fa-check"/> I Agree
+                            </button>
+                            <button type="button" className="btn btn-danger pull-left" id="print">
+                                <i className="fa fa-print"/> Print
+                            </button>
+                        </div>
                     </div>
-                  </form>
-
                 </div>
-                <p className="note text-center">*FREE Registration ends on October 2015.</p>
-                <h5 className="text-center">- Or sign in using -</h5>
-                <ul className="list-inline text-center">
-                  <li>
-                    <a href="#" className="btn btn-primary btn-circle"><i className="fa fa-facebook"/></a>
-                  </li>
-                  <li>
-                    <a href="#" className="btn btn-info btn-circle"><i className="fa fa-twitter"/></a>
-                  </li>
-                  <li>
-                    <a href="#" className="btn btn-warning btn-circle"><i className="fa fa-linkedin"/></a>
-                  </li>
-                </ul>
-              </div>
             </div>
-          </div>
+        )
+    }
 
-        </div>
-
-        {/* Modal */}
-        <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel"
-             aria-hidden="true">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <button type="button" className="close" data-dismiss="modal" aria-hidden="true">
-                  &times;
-                </button>
-                <h4 className="modal-title" id="myModalLabel">Terms & Conditions</h4>
-              </div>
-              <div className="modal-body custom-scroll terms-body">
-                <HtmlRender html={terms}/>
-              </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-default" data-dismiss="modal">
-                  Cancel
-                </button>
-                <button type="button" className="btn btn-primary" id="i-agree">
-                  <i className="fa fa-check"/> I Agree
-                </button>
-
-                <button type="button" className="btn btn-danger pull-left" id="print">
-                  <i className="fa fa-print"/> Print
-                </button>
-              </div>
+    render() {
+        return (
+            <div id="extr-page">
+                <header id="header" className="animated fadeInDown">
+                    <div id="logo-group">
+                        <span id="logo">
+                            <div><h1 className="logo-name text-center">TrackIt+</h1></div>
+                        </span>
+                    </div>
+                    <span id="extr-page-header-space">
+                        <span className="hidden-mobile hiddex-xs">Already registered?
+                        </span>&nbsp;<a href="#login" className="btn btn-danger">Sign In</a>
+                    </span>
+                </header>
+                <div id="main" role="main" className="animated fadeInDown">
+                    <div id="content" className="container">
+                        <div className="row">
+                            <DisplayContent />
+                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+                                <div className="well no-padding">
+                                    {this.displayForm}
+                                </div>
+                                <Footer />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {this.displayTerms}
             </div>
-            {/* /.modal-content */}
-          </div>
-          {/* /.modal-dialog */}
-        </div>
-        {/* /.modal */}
-      </div>
-    )
-  }
+        )
+    }
 }
