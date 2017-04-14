@@ -7,8 +7,8 @@ import Footer from '../components/Footer'
 
 export default class Login extends React.Component {
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.displayForm = this.displayForm();
         this.validationOptions = {
             // Rules for login form validation
@@ -34,6 +34,7 @@ export default class Login extends React.Component {
             },
             submitHandler: function(form) {
                 // Todo: Log in user here
+                console.log("MAde it.");
 
             }.bind(this)
         };

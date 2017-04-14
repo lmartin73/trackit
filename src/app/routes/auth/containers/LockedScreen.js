@@ -51,7 +51,7 @@ export default class LockedScreen extends React.Component {
                                             <button className="btn btn-primary" type="submit"><i className="fa fa-key"/></button>
                                         </div>
                                     </div>
-                                    <p className="no-margin margin-top-5">Logged as someone else? <a href="#/login"> Click here</a></p>
+                                    <p className="no-margin margin-top-5">Log in as someone else? <a href="#/login"> Click here</a></p>
                                 </div>
                             </div>
                             <p className="font-xs margin-top-5">Copyright TrackIt 2014-2020.</p>
