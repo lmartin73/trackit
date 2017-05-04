@@ -28,6 +28,7 @@ const routes = {
     require('./routes/e-commerce').default,
     require('./routes/misc').default,
     require('./routes/auth').default,
+    require('./routes/profile').default,
     require('./routes/app-views').default,
     require('./routes/maps').default,
     require('./routes/calendar').default,

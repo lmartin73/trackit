@@ -4,7 +4,8 @@
 
 import {createStore, combineReducers,  applyMiddleware} from 'redux'
 import thunk from 'redux-thunk'
-import {routerReducer} from 'react-router-redux'
+import {routerReducer, routerMiddleware} from 'react-router-redux'
+import {hashHistory} from 'react-router'
 
 import {config} from '../config/config'
 import {handleBodyClasses, dumpLayoutToStorage, layoutReducer} from '../components/layout'
@@ -32,9 +33,12 @@ export const rootReducer = combineReducers(
   }
 );
 
+const RouterMiddleware = routerMiddleware(hashHistory);
+
 const store =  createStore(rootReducer,
   applyMiddleware(
     thunk,
+    RouterMiddleware,
     handleBodyClasses,
     dumpLayoutToStorage,
     VoiceMiddleware
