@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
-import {syncHistoryWithStore} from 'react-router-redux'
+import {syncHistoryWithStore, routerActions} from 'react-router-redux'
 import {Router, hashHistory} from 'react-router'
 import * as firebase from 'firebase'
 import {FIRconfig} from './config/firebaseConfig' // import firebase config details
 
-
+import {logoutUser, startListeningToAuth} from './components/user'
 
 import store from './store/configureStore'
 

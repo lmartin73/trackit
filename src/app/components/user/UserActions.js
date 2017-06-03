@@ -1,7 +1,5 @@
-/**
- * Created by griga on 11/24/15.
- */
-
+import * as firebase from 'firebase'
+import * as UserConstants from './UserConstants'
 
 export const REQUEST_USER = 'REQUEST_USER'
 export const USER_INFO = 'USER_INFO'
@@ -21,3 +19,45 @@ export function requestUserInfo()
 
 }
 
+export function startListeningToAuth(){
+    return function(dispatch,getState){
+        firebase.auth().onAuthStateChanged(function(user){
+            if(user){
+                //user is authenticated.
+                dispatch({
+                    type: UserConstants.AUTHENTICATE_USER,
+                    AUTH_STATE: UserConstants.AUTHENTICATED,
+                    USER: user
+                })
+            }else{
+                //no user authenticated
+                if(getState().user.AUTH_STATE != UserConstants.GUEST){
+                    dispatch({
+                        type: UserConstants.LOGOUT_USER
+                    })
+                }
+            }
+        });
+    }
+
+}
+
+export function attemptLoginWithEmail(email,password){
+    return function(dispatch,getState){
+        dispatch({
+            type: UserConstants.ATTEMPT_LOGIN
+        })
+
+        firebase.auth().signInWithEmailAndPassword(email,password).catch(function(error){
+            //TODO HANDLE LOGIN ERRORS
+        });
+    }
+}
+
+export function logoutUser(){
+    return function(dispacth,getState){
+        firebase.auth().signOut().catch(function(error){
+            // TODO error handling when we can't logout user
+        })
+    }
+}
