@@ -9,8 +9,9 @@ export default class Login extends React.Component {
 
     constructor(props) {
         super(props);
+
+        // login form validation options
         this.validationOptions = {
-            // Rules for login form validation
             rules: {
                 email: {
                     required: true,
@@ -21,7 +22,7 @@ export default class Login extends React.Component {
                     minlength: 8
                 },
             },
-            // Messages for login form validation
+            // messages will show if rules arent followed
             messages: {
                 email: {
                     required: 'Email Required',
@@ -36,44 +37,6 @@ export default class Login extends React.Component {
 
             }.bind(this)
         };
-    }
-
-    displayForm() {
-        return(
-            <UiValidate options={this.validationOptions}>
-                <form id="form" className="smart-form client-form">
-                    <header>Sign In</header>
-                    <fieldset>
-                        <section>
-                            <label className="label">E-mail</label>
-                            <label className="input"> <i className="icon-append fa fa-user"/>
-                            <input type="email" name="email" ref="email" />
-                            <b className="tooltip tooltip-top-right"><i className="fa fa-user txt-color-teal"/>
-                                Please enter your email address.</b></label>
-                        </section>
-                        <section>
-                            <label className="label">Password</label>
-                            <label className="input"> <i className="icon-append fa fa-lock"/>
-                            <input type="password" name="password" ref="password" />
-                            <b className="tooltip tooltip-top-right"><i className="fa fa-lock txt-color-teal"/>
-                                Please enter your password.</b></label>
-                            <div className="note">
-                                <a href="#/forgot">Forgot password?</a>
-                            </div>
-                        </section>
-                        <section>
-                            <label className="checkbox">
-                                <input type="checkbox" name="remember" defaultChecked={true}/>
-                                <i/>Stay signed in
-                            </label>
-                        </section>
-                    </fieldset>
-                    <footer>
-                        <button type="submit" className="btn btn-primary">Sign in</button>
-                    </footer>
-                </form>
-            </UiValidate>
-        )
     }
 
     render() {
@@ -94,9 +57,41 @@ export default class Login extends React.Component {
                     <div id="content" className="container">
                         <div className="row">
                             <DisplayContent />
-                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-4">
+                            <div className="col-xs-12 col-sm-12 col-md-5 col-lg-5">
                                 <div className="well no-padding">
-                                    {this.displayForm()}
+                                    <UiValidate options={this.validationOptions}>
+                                        <form id="form" className="smart-form client-form">
+                                            <header>Sign In</header>
+                                            <fieldset>
+                                                <section>
+                                                    <label className="label">E-mail</label>
+                                                    <label className="input"> <i className="icon-append fa fa-user"/>
+                                                    <input type="email" name="email" ref="email" />
+                                                    <b className="tooltip tooltip-top-right"><i className="fa fa-user txt-color-teal"/>
+                                                        Please enter your email address.</b></label>
+                                                </section>
+                                                <section>
+                                                    <label className="label">Password</label>
+                                                    <label className="input"> <i className="icon-append fa fa-lock"/>
+                                                    <input type="password" name="password" ref="password" />
+                                                    <b className="tooltip tooltip-top-right"><i className="fa fa-lock txt-color-teal"/>
+                                                        Please enter your password.</b></label>
+                                                    <div className="note">
+                                                        <a href="#/forgot">Forgot password?</a>
+                                                    </div>
+                                                </section>
+                                                <section>
+                                                    <label className="checkbox">
+                                                        <input type="checkbox" name="remember" defaultChecked={true}/>
+                                                        <i/>Stay signed in
+                                                    </label>
+                                                </section>
+                                            </fieldset>
+                                            <footer>
+                                                <button type="submit" className="btn btn-primary">Sign in</button>
+                                            </footer>
+                                        </form>
+                                    </UiValidate>
                                 </div>
                                 <Footer />
                             </div>

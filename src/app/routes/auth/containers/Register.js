@@ -6,15 +6,14 @@ import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
 // Terms and agreement information
-const terms = require('html-loader!./TermsAndConditions.html');
+const terms = require('html-loader!../components/TermsAndConditions.html');
 
 export default class Register extends React.Component {
 
     constructor() {
         super();
-        // Initialize variable for register action method to keep form as a controlled component
+        // form validation options
         this.validationOptions = {
-            // Rules for registration form validation
             rules: {
                 firstname: {
                     required: true
@@ -36,7 +35,6 @@ export default class Register extends React.Component {
                     equalTo: '#password'
                 }
             },
-            // Messages for registration form validation
             messages: {
                 firstname: {
                     required: 'First Name Required'
@@ -62,53 +60,6 @@ export default class Register extends React.Component {
         };
     }
 
-    displayForm() {
-        return(
-            <UiValidate options={this.validationOptions}>
-                <form id="smart-form-register" className="smart-form client-form">
-                    <fieldset>
-                        <section>
-                            <label className="input"> <i className="icon-append fa fa-user"/>
-                            <input type="text" name="firstname" ref="firstname" placeholder="First Name" />
-                            <b className="tooltip tooltip-bottom-right">Please enter your first name.</b> </label>
-                        </section>
-                        <section>
-                            <label className="input"> <i className="icon-append fa fa-user"/>
-                            <input type="text" name="lastname" ref="lastname" placeholder="Last Name" />
-                            <b className="tooltip tooltip-bottom-right">Please enter your last name.</b> </label>
-                        </section>
-                        <section>
-                            <label className="input"> <i className="icon-append fa fa-envelope"/>
-                            <input type="email" name="email" ref="email" placeholder="Email" />
-                            <b className="tooltip tooltip-bottom-right">Please enter your email address.</b> </label>
-                        </section>
-                        <section>
-                            <label className="input"> <i className="icon-append fa fa-lock"/>
-                            <input type="password" name="password" ref="password" placeholder="Password" />
-                            <b className="tooltip tooltip-bottom-right">Please enter your password.</b> </label>
-                        </section>
-                        <section>
-                            <label className="input"> <i className="icon-append fa fa-lock"/>
-                            <input type="password" name="passwordConfirm" ref="passwordConfirm" placeholder="Confirm password" />
-                            <b className="tooltip tooltip-bottom-right">Please confirm your password.</b> </label>
-                        </section>
-                    </fieldset>
-                    <fieldset>
-                        <section>
-                            <label className="checkbox">
-                            <input type="checkbox" name="terms" id="terms" value="off"/>
-                            <i/>I agree with the <a href="#" data-toggle="modal" data-target="#myModal">
-                                Terms and Conditions </a></label>
-                        </section>
-                    </fieldset>
-                    <footer>
-                        <button type="submit" className="btn btn-primary">Register</button>
-                    </footer>
-                </form>
-            </UiValidate>
-        )
-    }
-
     displayTerms() {
         return(
             <div className="modal fade" id="myModal" tabIndex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -122,10 +73,6 @@ export default class Register extends React.Component {
                             <HtmlRender html={terms}/>
                         </div>
                         <div className="modal-footer">
-                            <button type="button" className="btn btn-default" data-dismiss="modal">Cancel</button>
-                            <button type="button" className="btn btn-primary" id="i-agree">
-                                <i className="fa fa-check"/> I Agree
-                            </button>
                             <button type="button" className="btn btn-danger pull-left" id="print">
                                 <i className="fa fa-print"/> Print
                             </button>
@@ -156,7 +103,48 @@ export default class Register extends React.Component {
                             <DisplayContent />
                             <div className="col-xs-12 col-sm-12 col-md-5 col-lg-5">
                                 <div className="well no-padding">
-                                    {this.displayForm()}
+                                    <UiValidate options={this.validationOptions}>
+                                        <form id="smart-form-register" className="smart-form client-form">
+                                            <fieldset>
+                                                <section>
+                                                    <label className="input"> <i className="icon-append fa fa-user"/>
+                                                    <input type="text" name="firstname" ref="firstname" placeholder="First Name" />
+                                                    <b className="tooltip tooltip-bottom-right">Please enter your first name.</b> </label>
+                                                </section>
+                                                <section>
+                                                    <label className="input"> <i className="icon-append fa fa-user"/>
+                                                    <input type="text" name="lastname" ref="lastname" placeholder="Last Name" />
+                                                    <b className="tooltip tooltip-bottom-right">Please enter your last name.</b> </label>
+                                                </section>
+                                                <section>
+                                                    <label className="input"> <i className="icon-append fa fa-envelope"/>
+                                                    <input type="email" name="email" ref="email" placeholder="Email" />
+                                                    <b className="tooltip tooltip-bottom-right">Please enter your email address.</b> </label>
+                                                </section>
+                                                <section>
+                                                    <label className="input"> <i className="icon-append fa fa-lock"/>
+                                                    <input type="password" name="password" ref="password" placeholder="Password" />
+                                                    <b className="tooltip tooltip-bottom-right">Please enter your password.</b> </label>
+                                                </section>
+                                                <section>
+                                                    <label className="input"> <i className="icon-append fa fa-lock"/>
+                                                    <input type="password" name="passwordConfirm" ref="passwordConfirm" placeholder="Confirm password" />
+                                                    <b className="tooltip tooltip-bottom-right">Please confirm your password.</b> </label>
+                                                </section>
+                                            </fieldset>
+                                            <fieldset>
+                                                <section>
+                                                    <label className="checkbox">
+                                                    <input type="checkbox" name="terms" id="terms" value="off"/>
+                                                    <i/>I agree with the <a href="#" data-toggle="modal" data-target="#myModal">
+                                                        Terms and Conditions </a></label>
+                                                </section>
+                                            </fieldset>
+                                            <footer>
+                                                <button type="submit" className="btn btn-primary">Register</button>
+                                            </footer>
+                                        </form>
+                                    </UiValidate>
                                 </div>
                                 <Footer />
                             </div>
