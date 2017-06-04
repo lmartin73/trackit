@@ -1,11 +1,56 @@
 import React from 'react'
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
+import { attemptLoginWithEmail } from '../../../components/user/UserActions'
+import { AUTHENTICATED, GUEST } from '../../../components/user/UserConstants'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
 
-export default class Login extends React.Component {
+const mapStateToProps = (state) => {
+    /*
+        Maps redux states to local props
+
+        - method is called everytime state is updated/changed
+        - authState: current authentication status
+    */
+    return {
+        authState: state.user.AUTH_STATE
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    /*
+        Maps the redux dispatch calls to local props
+
+        - attemptLogin: method to attempt to log in user
+        - loginSuccess: redirects to main webpage (dashboard)
+    */
+    return {
+        attemptLogin: (email, password) => {
+            dispatch(attemptLoginWithEmail(email, password))
+        },
+        loginSuccess: () => {dispatch(push('#/dashboard'))}
+    }
+}
+
+class Login extends React.Component {
+
+    componentWillReceiveProps(props) {
+        /*
+            Used as a handler for authentication state changes
+
+            - If state changed to authenticated, user is logged in
+            - If state is not changed to authenticated, do nothing
+        */
+        if (props.authState === AUTHENTICATED) {
+            this.props.loginSuccess()
+        } else if (props.authState === GUEST) {
+            // Todo: Error message
+        }
+    }
 
     constructor(props) {
         super(props);
@@ -19,7 +64,7 @@ export default class Login extends React.Component {
                 },
                 password: {
                     required: true,
-                    minlength: 8
+                    minlength: 6
                 },
             },
             // messages will show if rules arent followed
@@ -33,8 +78,15 @@ export default class Login extends React.Component {
                 },
             },
             submitHandler: function(form) {
-                // Todo: Log in user here
+                /*
+                    All validation has been successful
+                    Attempt to log in user
 
+                    - data:
+                        email: this.refs.email.value
+                        password: this.refs.password.value
+                */
+                this.props.attemptLogin(this.refs.email.value, this.refs.password.value)
             }.bind(this)
         };
     }
@@ -102,3 +154,6 @@ export default class Login extends React.Component {
         )
     }
 }
+
+// Use connect method to connect redux store to Login component
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

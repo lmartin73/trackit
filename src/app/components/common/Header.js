@@ -14,7 +14,66 @@ import LanguageSelector from '../i18n/LanguageSelector'
 
 import RecentProjects from './RecentProjects'
 
-export default class Header extends React.Component {
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
+import { logoutUser } from '../user/UserActions'
+import { AUTHENTICATED, GUEST } from '../user/UserConstants'
+
+
+const mapStateToProps = (state) => {
+    /*
+        Maps redux states to local props
+
+        - method is called everytime state is updated/changed
+        - authState: current authentication status
+    */
+    return {
+        authState: state.user.AUTH_STATE
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    /*
+        Maps the redux dispatch calls to local props
+
+        - logoutUser: method to log out user
+        - logoutSuccessful: redirects to log in page
+    */
+    return {
+        logoutUser: () => {dispatch(logoutUser())},
+        logoutSuccessful: () => {dispatch(push('#/login'))}
+    }
+}
+
+class Header extends React.Component {
+
+    componentWillReceiveProps(props) {
+        /*
+            Used as a handler for authentication state changes
+
+            - If state changed to GUEST, user is logged out (redirect)
+        */
+        if (props.authState === GUEST) {
+
+            // Redirect to log in page
+            props.logoutSuccessful();
+        }
+    }
+
+    signOutUser() {
+        /*
+            signs out user upon button click
+
+            - If user authentication state is AUTHENTICATED, dispatch log out user
+            - If not, then user isn't currently authentication
+        */
+        if (this.props.authState === AUTHENTICATED) {
+            this.props.logoutUser();
+        }
+        this.props.logoutSuccessful();
+
+    }
+
   render() {
     return <header id="header">
       <div id="logo-group">
@@ -76,7 +135,7 @@ export default class Header extends React.Component {
 
         {/* logout button */}
         <div id="logout" className="btn-header transparent pull-right">
-                    <span> <a href="#/login" title="Sign Out"
+                    <span> <a onClick={() => this.signOutUser()} title="Sign Out"
                               data-logout-msg="You can improve your security further after logging out by closing this opened browser"><i
                       className="fa fa-sign-out"/></a> </span>
         </div>
@@ -134,3 +193,5 @@ export default class Header extends React.Component {
     </header>
   }
 }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Header)
