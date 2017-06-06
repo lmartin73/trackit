@@ -3,6 +3,7 @@ import * as firebase from 'firebase'
 export class UserProfile {
 
     constructor(uid=""){
+        this.hasLoaded = false;
         this.uid = uid;
         this.firstname = "";
         this.lastname = "";
@@ -37,6 +38,13 @@ export class UserProfile {
         this.downloadProfile();
 
     };
+
+    fetchUser(uid){
+        this.uid = uid;
+        this.profileDataPath = `users/${this.uid}`;
+        this.profileStoragePath = `users/${this.uid}/`
+        this.downloadProfile();
+    }
 
     /* Create a user profile in our database for a user who has used Facebook or Google to sign up */
     createProfileViaProvider(user){
@@ -77,7 +85,7 @@ export class UserProfile {
             state: state,
             zip: zip,
             country: country,
-            type: type
+            address_type: type
         });
     }
 
@@ -119,11 +127,28 @@ export class UserProfile {
             this.country = snapshot.val().country;
             this.address_type = snapshot.val().address_type;
             this.photoDownloadURL = snapshot.val().photoURL;
+            this.hasLoaded = true;
+
+
+
+
         }.bind(this));
 
     }
 
+    hasProfileLoaded(){
+        return this.hasLoaded;
+    }
 
+
+    updateProfile(profileData){
+        this.setName(profileData.firstname, profileData.lastname);
+        this.setAddress(profileData.street1,profileData.street2,profileData.city,profileData.state,
+                        profileData.zip, profileData.country, profileData.address_type)
+        this.setPhone(profileData.phone, profileData.phone_type);
+        this.setEmail(profileData.email);
+        this.setProfileImg(profileData.photoURL)
+    }
     /* Getters to access user data. */
 
     getUserProfile(){
@@ -148,6 +173,7 @@ export class UserProfile {
             photoURL: this.photoDownloadURL
 
         };
+
         return profileData;
     }
 

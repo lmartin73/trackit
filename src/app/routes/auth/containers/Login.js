@@ -155,5 +155,7 @@ class Login extends React.Component {
     }
 }
 
+
 // Use connect method to connect redux store to Login component
 export default connect(mapStateToProps, mapDispatchToProps)(Login)
+

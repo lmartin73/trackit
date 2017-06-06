@@ -1,8 +1,11 @@
 import * as firebase from 'firebase'
 import * as UserConstants from './UserConstants'
+import * as ProfileConstants from '../../routes/profile/containers/ProfileConstants'
+import {loadUserProfile, storeUserProfile} from '../../routes/profile/containers/ProfileActions'
 
 export const REQUEST_USER = 'REQUEST_USER'
 export const USER_INFO = 'USER_INFO'
+
 
 export function requestUserInfo()
 {
@@ -15,8 +18,6 @@ export function requestUserInfo()
         })
       })
   }
-
-
 }
 
 export function startListeningToAuth(){
@@ -29,6 +30,9 @@ export function startListeningToAuth(){
                     AUTH_STATE: UserConstants.AUTHENTICATED,
                     USER: user
                 })
+                //load user profile
+                dispatch(loadUserProfile(user.uid));
+
             }else{
                 //no user authenticated
                 if(getState().user.AUTH_STATE != UserConstants.GUEST){
@@ -36,6 +40,10 @@ export function startListeningToAuth(){
                         type: UserConstants.LOGOUT_USER
                     })
                 }
+                //unload user profile
+                dispatch({
+                    type: ProfileConstants.UNLOAD_PROFILE
+                })
             }
         });
     }

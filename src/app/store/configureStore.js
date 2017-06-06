@@ -15,10 +15,11 @@ import {userReducer, requestUserInfo} from '../components/user'
 import {chatReducer, chatInit} from '../components/chat'
 import {eventsReducer} from '../components/calendar'
 import outlookReducer from '../routes/outlook/outlookReducer'
-
+import profileReducer from '../routes/profile/containers/ProfileReducer'
 
 import {voiceReducer, VoiceMiddleware} from '../components/voice-control'
 import {voiceControlOn} from "../components/voice-control/VoiceActions";
+
 
 export const rootReducer = combineReducers(
   {
@@ -30,6 +31,7 @@ export const rootReducer = combineReducers(
     chat: chatReducer,
     events: eventsReducer,
     voice: voiceReducer,
+    profile: profileReducer,
   }
 );
 
