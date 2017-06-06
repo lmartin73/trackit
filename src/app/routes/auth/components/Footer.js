@@ -1,7 +1,11 @@
 import React from 'react'
 
 export default class Footer extends React.Component {
+    /*
+        Footer component on all authentication components
 
+        - Allows signin from 3rd party providers (Facebook, Google)
+    */
     constructor() {
         super();
         // Initialize variables for action methods to keep component as a controlled component
@@ -10,13 +14,20 @@ export default class Footer extends React.Component {
     }
 
     facebookSignIn(event) {
+        /*
+            Signin/Signup with facebook provider
+
+        */
         event.preventDefault();
-        // Todo: Sign in with facebook here
+        // Todo: Sign in with facebook
     }
 
     googleSignIn(event) {
+        /*
+            Signin/Signup with google provider
+        */
         event.preventDefault();
-        // Todo: Sign in with google here
+        // Todo: Sign in with google
     }
 
     render() {

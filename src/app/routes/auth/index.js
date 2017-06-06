@@ -1,6 +1,8 @@
 import React from 'react';
-import HtmlRender from '../../components/utils/HtmlRender'
 
+/*
+    list of routes for authetication components
+*/
 export default {
   childRoutes: [
     {

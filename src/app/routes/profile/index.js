@@ -1,5 +1,8 @@
 import React from 'react';
 
+/*
+    list of routes for profile components
+*/
 export default {
     path: 'settings',
     component: require('../../components/common/Layout').default,

@@ -10,12 +10,17 @@ import '../../../../../node_modules/jquery.maskedinput/src/jquery.maskedinput.js
 
 
 export default class EditProfile extends React.Component {
+    /*
+        Allows user to edit their profile information
 
+        - Todo: add proper input masking
+    */
     constructor() {
         super();
+        // Bind methods to this
         this.photoHandler = this.photoHandler.bind(this);
-        this.onChange = this.onInputChange.bind(this);
         this.validationOptions = {
+            // Rules for validation
             rules: {
                 firstname: {
                     required: true
@@ -56,6 +61,7 @@ export default class EditProfile extends React.Component {
                     required: true
                 }
             },
+            // Messages will show if validation rules aren't followed
             messages: {
                 firstname: {
                     required: "First Name Required"
@@ -93,15 +99,25 @@ export default class EditProfile extends React.Component {
                 }
             },
             submitHandler: function(form) {
-                // Todo: Save changes here (this.refs)
-                store.dispatch(push('settings/profile'));
+                /*
+                    Form validation is successful at this point
+
+                    - Todo: save changes to profile
+                    - this.refs
+                    - store.dispatch(push('settings/profile'));
+                */
             }.bind(this)
         };
     }
 
     photoHandler(event) {
+        /*
+            Method handler when new photo is selected for profile image
+
+            - Todo: Fix image rendering issue. Some iamges render rotated 90 deg, due to image metadata
+            - Method may be best being more global, since functionality is used by multiple components
+        */
         event.preventDefault();
-        // Todo: Fix image rendering issue. Some images render rotated 90 degrees, due to image metadata
         var reader = new FileReader();
         reader.onload = function (e) {
             this.refs.image.src = e.target.result;

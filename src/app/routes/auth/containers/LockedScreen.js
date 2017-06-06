@@ -4,27 +4,39 @@ import './LockedScreen.css'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 
 export default class LockedScreen extends React.Component {
+    /*
+        Allows user to unlock account after a certain amount of inactivity
 
+        - User must enter password to unlock account
+    */
     constructor() {
         super();
+        // Temp
         this.state = {photoSrc: "assets/img/avatars/user.png"};
+
+        // Form validation
         this.validationOptions = {
-            // Rules for locked screen form validation
+            // Rules for  validation
             rules: {
                 password: {
                     required: true,
                     minlength: 8
                 }
             },
-            // Messages for locked screen form validation
+            // Messages will show when validation isn't followed
             messages: {
                 password: {
                     required: 'Password required'
                 }
             },
             submitHandler: function(form) {
-                // Todo: Check password here
+                /*
+                    All validation is successful
 
+                    - Todo: check user password (hash)
+                    - if password correct, proceed to main page
+                    - if password incorrect, keep account locked
+                */
             }.bind(this)
         };
     }

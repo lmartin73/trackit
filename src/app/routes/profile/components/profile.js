@@ -1,7 +1,10 @@
 import React from 'react'
 
-// Dumb profile component
-// All data and actions passed in from props
+/*
+    Dumb profile component
+
+    - All data and actions passed in from props
+*/
 export const Profile = (props) => {
     return(
         <div id="content">

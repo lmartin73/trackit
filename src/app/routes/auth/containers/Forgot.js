@@ -5,17 +5,24 @@ import { DisplayContent } from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
 export default class Forgot extends React.Component {
+    /*
+        Allows user to reset their password
 
+        - Retrieves user email
+        - Sends password reset email to user, to reset with given link
+    */
     constructor() {
         super();
         // form validation options
         this.validationOptions = {
+            // Rules for input fields
             rules: {
                 email: {
                     required: true,
                     email: true
                 }
             },
+            // Messages will show if rules aren't followed
             messages: {
                 email: {
                     required: 'Email Required',
@@ -23,8 +30,11 @@ export default class Forgot extends React.Component {
                 }
             },
             submitHandler: function(form) {
-                // Todo: Send recovery email here
+                /*
+                    All form validation is successful
 
+                    - Todo: Send password recovery email
+                */
             }.bind(this)
         };
     }
