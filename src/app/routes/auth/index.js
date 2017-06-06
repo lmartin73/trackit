@@ -34,6 +34,14 @@ export default {
           cb(null, m.default)
         })
       }
+    },
+    {
+      path: 'createprofile',
+      getComponent(nextState, cb){
+        System.import('./containers/CreateProfile').then((m)=> {
+          cb(null, m.default)
+        })
+      }
     }
   ]
 };

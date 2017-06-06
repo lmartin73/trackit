@@ -2,31 +2,19 @@ import React from 'react'
 import { push } from 'react-router-redux'
 import store from '../../../store/configureStore'
 import countries from '../../../components/forms/commons/countries'
-import { phoneTypes, addressTypes }  from '../../../components/forms/commons/form_defines'
+import { phoneTypes, addressTypes, fileDefs }  from '../../../components/forms/commons/form_defines'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import JarvisWidget from '../../../components/widgets/JarvisWidget'
 import { bigBox } from "../../../components/utils/actions/MessageActions";
 import '../../../../../node_modules/jquery.maskedinput/src/jquery.maskedinput.js'
 
-// Used for checking file (photo)
-const SELECTED_FILES_COUNT = 1;
-const SELECTED_FILE_INDEX = 0
-const MAX_FILE_SIZE = 100000    // (in bytes) todo: to be modified
-const ALERT_TIMEOUT = 6000      // 6 seconds
-
 
 export default class EditProfile extends React.Component {
-
-    componentDidMount() {
-        // Mask inputs to ensure correct values
-        $('#phone').mask('(999) 999-9999');
-        $('#zip').mask('99999?-9999');
-        $('#state').mask('aa');
-    }
 
     constructor() {
         super();
         this.photoHandler = this.photoHandler.bind(this);
+        this.onChange = this.onInputChange.bind(this);
         this.validationOptions = {
             rules: {
                 firstname: {
@@ -53,9 +41,13 @@ export default class EditProfile extends React.Component {
                 },
                 state: {
                     required: true,
+                    minlength: 2,
+                    maxlength: 2
                 },
                 zip: {
                     required: true,
+                    minlength: 5,
+                    maxlength: 10
                 },
                 country: {
                     required: true
@@ -114,9 +106,9 @@ export default class EditProfile extends React.Component {
         reader.onload = function (e) {
             this.refs.image.src = e.target.result;
         }.bind(this)
-        if (this.refs.imageSelect.files.length == SELECTED_FILES_COUNT) {
-            var file = this.refs.imageSelect.files[SELECTED_FILE_INDEX];
-            if (file.size <= MAX_FILE_SIZE) {
+        if (this.refs.imageSelect.files.length == fileDefs.SELECTED_FILES_COUNT) {
+            var file = this.refs.imageSelect.files[fileDefs.SELECTED_FILE_INDEX];
+            if (file.size <= fileDefs.MAX_FILE_SIZE) {
                 reader.readAsDataURL(file);
             } else {
                 // Custom alert box if file too large
@@ -128,6 +120,31 @@ export default class EditProfile extends React.Component {
                     timeout: ALERT_TIMEOUT
                 });
             }
+        }
+    }
+
+    onInputChange(event) {
+        event.preventDefault();
+        var value = event.target.value;
+        if (event.target.name == "phone") {
+
+            // Remove any unneccessary characters
+            value = value.replace(/[^\d]/g, '');
+            if (value.length == 7) {
+
+                // Format phone string with middle dash
+                value = value.replace(/(\d{3})(\d{4})/, "$1-$2");
+            } else if (value.length == 10) {
+
+                // Format phone strong with parenthesis and middle dash
+                value = value.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
+            }
+            event.target.value = value;
+        } else if (event.target.name == "state") {
+
+            // Convert state to all uppercase
+            value = value.toUpperCase();
+            event.target.value = value;
         }
     }
 
@@ -184,7 +201,7 @@ export default class EditProfile extends React.Component {
                                                 <div className="row">
                                                     <section className="col col-8">
                                                             <label className="input"> <i className="icon-prepend fa fa-phone"/>
-                                                                <input type="tel" name="phone" ref="phone" id="phone" placeholder="Phone" defaultValue={""} />
+                                                                <input type="tel" name="phone" ref="phone" id="phone" placeholder="Phone" defaultValue={""} onChange={this.onChange} />
                                                             </label>
                                                     </section>
                                                     <section className="col col-4">
@@ -224,7 +241,7 @@ export default class EditProfile extends React.Component {
                                                     </section>
                                                     <section className="col col-2">
                                                         <label className="input">
-                                                            <input type="text" name="state" ref="state" id="state" placeholder="State" defaultValue={""}/>
+                                                            <input type="text" name="state" ref="state" id="state" placeholder="State" defaultValue={""} onChange={this.onChange}/>
                                                         </label>
                                                     </section>
                                                     <section className="col col-4">

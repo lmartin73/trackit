@@ -26,8 +26,9 @@ export default class Wizard extends React.Component {
 
 
     element.on('click', '[data-smart-wizard-tab]', function (e) {
-      setStep(parseInt($(this).data('smartWizardTab')));
       e.preventDefault();
+      // Disable tabs from being accessed directly
+      return false;
     });
 
     $next.on('click', function (e) {
@@ -45,6 +46,7 @@ export default class Wizard extends React.Component {
             .html('<i class="fa fa-check"></i>');
         }
       }
+
       if (currentStep < stepsCount) {
         setStep(currentStep + 1);
       } else {
@@ -72,6 +74,7 @@ export default class Wizard extends React.Component {
     });
 
     $prev.on('click', function (e) {
+
       if (!$prev.hasClass('disabled') && currentStep > 0) {
         setStep(currentStep - 1);
       }
