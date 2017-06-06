@@ -14,6 +14,7 @@ export default class ProfileContainer extends React.Component {
     constructor() {
         super();
         this.editProfileAction = this.editProfileClicked.bind(this);
+        this.userInfo = {}
 
         // todo: retrieve user information from redux store
     }

@@ -265,6 +265,7 @@ export default class EditProfile extends React.Component {
                                             </fieldset>
                                             <footer>
                                                 <button type="submit" className="btn btn-primary">Save Changes</button>
+                                                <button type="button" className="btn btn-default">Cancel</button>
                                             </footer>
                                         </form>
                                     </UiValidate>

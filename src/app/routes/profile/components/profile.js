@@ -6,10 +6,10 @@ export const Profile = (props) => {
     return(
         <div id="content">
             <div className="row">
-                <div className="col-sm-12">
+                <div className="col-sm-12 col-md-10 col-lg-6">
                     <div className="well well-sm">
                         <div className="row">
-                            <div className="col-sm-12 col-md-12 col-lg-6">
+                            <div className="col col-12">
                                 <div className="well well-light well-sm no-margin no-padding">
                                     <div className="row">
                                         <div className="col-sm-12">
