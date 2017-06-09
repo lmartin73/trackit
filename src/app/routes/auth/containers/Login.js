@@ -5,7 +5,7 @@ import { push } from 'react-router-redux'
 import { attemptLoginWithEmail } from '../../../components/user/UserActions'
 import { AUTHENTICATED, GUEST } from '../../../components/user/UserConstants'
 import UiValidate from '../../../components/forms/validation/UiValidate'
-import {DisplayContent} from '../components/DisplayContent'
+import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
 

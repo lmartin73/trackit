@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom';
 import UiValidate from '../../../components/forms/validation/UiValidate'
-import { DisplayContent } from '../components/DisplayContent'
+import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
 export default class Forgot extends React.Component {

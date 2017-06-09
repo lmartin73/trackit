@@ -2,7 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom';
 import HtmlRender from '../../../components/utils/HtmlRender'
 import UiValidate from '../../../components/forms/validation/UiValidate'
-import {DisplayContent} from '../components/DisplayContent'
+import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 
 // Terms and agreement information
