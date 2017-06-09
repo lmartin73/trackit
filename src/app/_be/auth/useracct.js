@@ -1,6 +1,36 @@
 import * as firebase from 'firebase'
 
+
+/* Profile data structure
+    database ref: users/uid/
+
+    profileData = {
+        firstname: ...,
+        lastname: ...,
+        phone: ...,
+        phone_type: ...,
+        email: ...,
+        street1: ...,
+        street2: ...,
+        city: ...,
+        state: ...,
+        country: ...,
+        zip: ...,
+        address_type: ...,
+        photoURL: ...,
+    }
+
+
+    database ref: user/organizations/uid
+    role = {
+        isMember: boolean
+        isAdministator: boolean
+        isOwner: boolean
+        isPending: boolean
+    }
+*/
 export class UserProfile {
+
 
     constructor(uid=""){
         this.hasLoaded = false;
@@ -20,6 +50,7 @@ export class UserProfile {
         this.photoDownloadURL = "";
         this.profileDataPath = `users/${this.uid}`;
         this.profileStoragePath = `users/${this.uid}/`
+        this.orgDataPath =`organizations`;
         if(uid != ""){
             this.downloadProfile();
         }
@@ -97,7 +128,7 @@ export class UserProfile {
 
     setProfileImg(file=null){
         var imgStorageRef = firebase.storage().ref();
-        var profilePhoto = imgStorageRef.child(`${this.profileStoragePath}\profileimg`);
+        var profilePhoto = imgStorageRef.child(`${this.profileStoragePath}/profileimg`);
         if(file != null){
             profilePhoto.put(file).then(function(snapshot){
                 this.setPhotoURL(snapshot.downloadURL);
@@ -110,6 +141,14 @@ export class UserProfile {
         firebase.database().ref(this.profileDataPath).update({
             photoURL: URL
         });
+    }
+
+    //update a user's role in an organization
+    updateOrgRole(orgUID, role){
+        //make sure the user's uid is initialize first
+        if(this.uid != ""){
+            firebase.database().ref(`${this.profileDataPath}/${this.orgDataPath}/${orgUID}`).update(role);
+        }
     }
 
     downloadProfile(){
@@ -157,19 +196,15 @@ export class UserProfile {
             firstname: this.firstname,
             lastname: this.lastname,
             email: this.email,
-            phone: {
-                number: this.phone,
-                type: this.phone_type
-            },
-            address: {
-                street1: this.street1,
-                street2: this.street2,
-                city: this.city,
-                state: this.state,
-                zip: this.zip,
-                country: this.country,
-                type: this.address_type
-            },
+            phone: this.phone,
+            phone_type: this.phone_type,
+            street1: this.street1,
+            street2: this.street2,
+            city: this.city,
+            state: this.state,
+            zip: this.zip,
+            country: this.country,
+            address_type: this.address_type,
             photoURL: this.photoDownloadURL
 
         };
