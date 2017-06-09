@@ -41,7 +41,7 @@ const routes = {
 
 //initialize firebase
 firebase.initializeApp(FIRconfig.config);
-store.dispatch(startListeningToAuth());
+
 
 // Activate authentication listener
 store.dispatch(startListeningToAuth());
