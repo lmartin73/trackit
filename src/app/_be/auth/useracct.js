@@ -143,11 +143,11 @@ export class UserProfile {
         });
     }
 
-    //update a user's role in an organization
-    updateOrgRole(orgUID, role){
+    //this returns a firebase database reference to the user's roles within a given organization
+    getOrgRef(orgUID=null){
         //make sure the user's uid is initialize first
-        if(this.uid != ""){
-            firebase.database().ref(`${this.profileDataPath}/${this.orgDataPath}/${orgUID}`).update(role);
+        if((this.uid != "") && orgUID){
+            return firebase.database().ref(`${this.profileDataPath}/${this.orgDataPath}/${orgUID}`)
         }
     }
 
