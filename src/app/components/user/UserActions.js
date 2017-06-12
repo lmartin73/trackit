@@ -45,7 +45,7 @@ export function startListeningToAuth(){
                 dispatch({
                     type: ProfileConstants.UNLOAD_PROFILE
                 })
-                dispatch(push('login'))
+                dispatch(push('/login'))
             }
         });
     }

@@ -35,7 +35,7 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(attemptLoginWithEmail(email, password))
         },
         loginSuccess: () => {
-            dispatch(push('#/dashboard'))
+            dispatch(push('/dashboard'))
             smallBox({
                 title: "Signed In!",
                 content: "<i class='fa fa-clock-o'></i> <i>Welcome back to TrackIt!</i>",
