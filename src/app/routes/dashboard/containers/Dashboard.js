@@ -1,4 +1,4 @@
-/**
+/*
  * Created by griga on 11/30/15.
  */
 

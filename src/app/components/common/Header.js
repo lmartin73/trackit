@@ -18,6 +18,7 @@ import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import { logoutUser } from '../user/UserActions'
 import { AUTHENTICATED, GUEST } from '../user/UserConstants'
+import {smallBox, SmartMessageBox} from "../utils/actions/MessageActions";
 
 
 const mapStateToProps = (state) => {
@@ -28,7 +29,8 @@ const mapStateToProps = (state) => {
         - authState: current authentication status
     */
     return {
-        authState: state.user.AUTH_STATE
+        authState: state.user.AUTH_STATE,
+        isLogging: state.user.isLogging
     }
 }
 
@@ -37,44 +39,49 @@ const mapDispatchToProps = (dispatch) => {
         Maps the redux dispatch calls to local props
 
         - logoutUser: method to log out user
-        - logoutSuccessful: redirects to log in page
     */
     return {
         logoutUser: () => {dispatch(logoutUser())},
-        logoutSuccessful: () => {dispatch(push('#/login'))}
     }
 }
 
 class Header extends React.Component {
 
-    componentWillReceiveProps(props) {
-        /*
-            Used as a handler for authentication state changes
-
-            - If state changed to GUEST, user is logged out (redirect)
-        */
-        if (props.authState === GUEST) {
-
-            // Redirect to log in page
-            props.logoutSuccessful();
-        }
+    constructor(props) {
+        super(props);
+        this.signout = this.signOutUser.bind(this);
     }
 
     signOutUser() {
         /*
             signs out user upon button click
-
-            - If user authentication state is AUTHENTICATED, dispatch log out user
-            - If not, then user isn't currently authentication
         */
-        if (this.props.authState === AUTHENTICATED) {
-            this.props.logoutUser();
-        }
-        this.props.logoutSuccessful();
-
+        SmartMessageBox({
+            title: "Are you sure?",
+            content: "Are you sure you want to log out?",
+            buttons: '[No][Yes]'
+        }, function (ButtonPressed) {
+            if (ButtonPressed === "Yes") {
+                this.props.logoutUser();
+            }
+            if (ButtonPressed === "No") {
+                // Nothing
+            }
+        }.bind(this));
     }
 
   render() {
+    if (this.props.isLogging) {
+        return (
+            <div>
+                <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                    <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
+                </div><br/>
+                <p className="text-center text-muted">Logging out...</p>
+            </div>
+        )
+    }
+
     return <header id="header">
       <div id="logo-group">
                 <span id="logo">
@@ -135,9 +142,9 @@ class Header extends React.Component {
 
         {/* logout button */}
         <div id="logout" className="btn-header transparent pull-right">
-                    <span> <a onClick={() => this.signOutUser()} title="Sign Out"
-                              data-logout-msg="You can improve your security further after logging out by closing this opened browser"><i
-                      className="fa fa-sign-out"/></a> </span>
+                    <span><a onClick={this.signout}
+                              ><i
+                      className="fa fa-sign-out"/></a></span>
         </div>
 
         {/* search mobile button (this is hidden till mobile view port) */}

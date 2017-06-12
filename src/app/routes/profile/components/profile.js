@@ -27,13 +27,13 @@ export const Profile = (props) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <div className="col-sm-12">
+                                        <div className="col-xs-12">
                                             <div className="row">
-                                                <div className="col-sm-3 profile-pic">
-                                                    <img src={props.user.photo} style={{backgroundColor: "gainsboro"}} />
+                                                <div className="col-xs-3 profile-pic">
+                                                    <img src={props.user.photoURL} style={{backgroundColor: "gainsboro"}} />
                                                 </div>
-                                                <div className="col-sm-6">
-                                                    <h1>{props.user.firstname}<span className="semi-bold">{props.user.lastname}</span><br />
+                                                <div className="col-xs-6">
+                                                    <h1>{props.user.firstname + " "}<span className="semi-bold">{props.user.lastname}</span><br />
                                                         <small>{"Company"}</small>
                                                     </h1>
                                                     <ul className="list-unstyled text-left">
@@ -44,16 +44,16 @@ export const Profile = (props) => {
                                                         </li>
                                                         <li>
                                                             <p className="text-muted">
-                                                                <i className="fa fa-phone" />&nbsp;&nbsp;<span className="txt-color-darken">{props.user.phone.number}</span>
-                                                                <small className="pull-right text-primary">{props.user.phone.type}</small>
+                                                                <i className="fa fa-phone" />&nbsp;&nbsp;<span className="txt-color-darken">{props.user.phone}</span>
+                                                                <small className="pull-right text-primary">{props.user.phone_type}</small>
                                                             </p>
                                                         </li>
                                                         <li>
                                                             <p className="text-muted">
                                                                 <i className="fa fa-map-marker" />&nbsp;&nbsp;<span className="txt-color-darken">
-                                                                    {props.user.address.city + ", " + props.user.address.state}
+                                                                    {props.user.city + ", " + props.user.state}
                                                                 </span>
-                                                                <small className="pull-right text-primary">{props.user.address.type}</small>
+                                                                <small className="pull-right text-primary">{props.user.address_type}</small>
                                                             </p>
                                                         </li>
                                                     </ul>

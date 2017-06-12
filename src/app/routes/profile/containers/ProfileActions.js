@@ -1,6 +1,6 @@
 import UserProfile from '../../../_be/auth/useracct.js'
 import * as ProfileConstants from './ProfileConstants'
-import * as UserActions from  '../../../components/user/UserActions'
+import * as UserActions from '../../../components/user/UserActions'
 import { currentProfile }from '../../../store/tiStatic'
 
 //download the user profile from the remote server

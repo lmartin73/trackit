@@ -186,7 +186,7 @@ export class UserProfile {
                         profileData.zip, profileData.country, profileData.address_type)
         this.setPhone(profileData.phone, profileData.phone_type);
         this.setEmail(profileData.email);
-        this.setProfileImg(profileData.photoURL)
+        this.setPhotoURL(profileData.photoURL)
     }
     /* Getters to access user data. */
 

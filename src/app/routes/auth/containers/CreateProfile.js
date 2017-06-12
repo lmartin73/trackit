@@ -7,9 +7,39 @@ import WidgetGrid from '../../../components/widgets/WidgetGrid'
 import { phoneTypes, addressTypes, fileDefs }  from '../../../components/forms/commons/form_defines'
 import { bigBox } from "../../../components/utils/actions/MessageActions";
 import { WelcomeContent } from '../components/WelcomeContent'
+import { push } from 'react-router-redux'
+import { connect } from 'react-redux'
 
 
-export default class CreateProfile extends React.Component {
+const mapStateToProps = (state) => {
+    /*
+        Maps redux states to local props
+
+        - method is called everytime state is updated/changed
+        - authState: current authentication status
+    */
+    return {
+        profile: state.profile.profile,
+        profile_loading: state.profile.isLoading,
+        profile_state: state.profile.profile_state
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    //console.log(dispatch)
+    /*
+        Maps the redux dispatch calls to local props
+
+        - attemptLogin: method to attempt to log in user
+        - loginSuccess: redirects to main webpage (dashboard)
+    */
+    return {
+        update_profile: (profile) => {dispatch(updateUserProfile(profile))},
+        go_to_dashboard: () => {dispatch(push('/dashboard'))}
+    }
+}
+
+class CreateProfile extends React.Component {
     /*
         Allows user to set up their profile after registering
     */
@@ -20,12 +50,10 @@ export default class CreateProfile extends React.Component {
         this.onInputChange = this.onInputChange.bind(this);
         this.photoHandler = this.photoHandler.bind(this);
 
-        // State used to display user input information on step 3 (Verification)
-        // Can not access refs in render method (DOM hasnt been rendered, refs are undefined)
         this.state = {
-            firstname: "",            // Get first name after registering
-            lastname: "",            // Get last name after registering
-            email: "",     // Get email after registering
+            firstname: this.props.profile.firstname,
+            lastname: this.props.profile.lastname,
+            email: this.props.profile.email,
             phone: "",
             phone_type: "",
             street1: "",
@@ -35,7 +63,7 @@ export default class CreateProfile extends React.Component {
             zip: "",
             country: "",
             address_type: "",
-            photo_url: ""
+            photoURL: ""
         };
 
         // Form validation options
@@ -129,12 +157,30 @@ export default class CreateProfile extends React.Component {
         };
     }
 
+    componentWillReceiveProps(newprops) {
+        /*
+            Used as a handler for profile updated changes
+
+            - If profile state is profile_updated, call back_to_profile
+        */
+        if (newprops.profile_state === PROFILE_UPDATED) {
+            this.props.go_to_dashboard()
+            smallBox({
+                title: "Successful!",
+                content: "<i class='fa fa-clock-o'></i> <i>Welcome to Trackit!</i>",
+                color: "#659265",
+                iconSmall: "fa fa-check fa-2x fadeInRight animated",
+                timeout: 4000
+            });
+        }
+    }
+
     onWizardComplete(data){
         /*
-            Todo: create user profile
-            - use refs to access data from form
-            - navigate to home page
+            Todo: update user profile
+            - navigate to dashboard
         */
+        this.props.update_profile(this.state);
     }
 
     photoHandler(event) {
@@ -146,7 +192,7 @@ export default class CreateProfile extends React.Component {
         event.preventDefault();
         var reader = new FileReader();
         reader.onload = function (e) {
-            this.refs.image.src = e.target.result;
+            this.setState({photoURL: e.target.result});
         }.bind(this)
         if (this.refs.imageSelect.files.length == fileDefs.SELECTED_FILES_COUNT) {
             var file = this.refs.imageSelect.files[fileDefs.SELECTED_FILE_INDEX];
@@ -154,26 +200,21 @@ export default class CreateProfile extends React.Component {
                 reader.readAsDataURL(file);
             } else {
                 // Custom alert box if file too large
-                bigBox({
-                    title: "Error!",
-                    content: "Photo too large to upload. Please select another photo...",
+                smallBox({
+                    title: "Callback function",
+                    content: "<i class='fa fa-clock-o'></i> <i>Photo too large. Please choose another one.</i>",
                     color: "#C46A69",
-                    icon: "fa fa-warning shake animated",
-                    timeout: fileDefs.ALERT_TIMEOUT
+                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                    timeout: 4000
                 });
             }
         }
     }
 
-    // Change the state when user updates information
-    // Masked Input was not firing on change event
-    // Masked Input value was the raw input value, not the full masked value
-    // This code formats the input as it is typed
     onInputChange(event) {
         /*
             Masks input fields (if needed) as user types
-
-            - recieves js event from textfields
+            and updates state
         */
         event.preventDefault();
         var value = event.target.value;
@@ -197,12 +238,24 @@ export default class CreateProfile extends React.Component {
             value = value.toUpperCase();
             event.target.value = value;
         }
-        var stateChange = {};
-        stateChange[event.target.name] = value;
-        this.setState(stateChange);
+        // Update state
+        var new_state = {};
+        new_state[event.target.name] = value;
+        this.setState(new_state);
     }
 
     render() {
+        if (this.props.profile_loading) {
+            return(
+                <div>
+                    <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
+                    </div><br/>
+                    <p className="text-center text-muted">Saving profile...</p>
+                </div>
+            )
+        }
+
         return(
             <div id="extr-page">
                 <header id="header" className="animated fadeInDown">
@@ -484,3 +537,6 @@ export default class CreateProfile extends React.Component {
         )
     }
 }
+
+// Connect state and dispatch the component props
+export default connect(mapStateToProps, mapDispatchToProps)(CreateProfile)

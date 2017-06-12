@@ -2,6 +2,7 @@ import * as firebase from 'firebase'
 import * as UserConstants from './UserConstants'
 import * as ProfileConstants from '../../routes/profile/containers/ProfileConstants'
 import {loadUserProfile, storeUserProfile} from '../../routes/profile/containers/ProfileActions'
+import { push } from 'react-router-redux'
 
 export const REQUEST_USER = 'REQUEST_USER'
 export const USER_INFO = 'USER_INFO'
@@ -44,6 +45,7 @@ export function startListeningToAuth(){
                 dispatch({
                     type: ProfileConstants.UNLOAD_PROFILE
                 })
+                dispatch(push('login'))
             }
         });
     }

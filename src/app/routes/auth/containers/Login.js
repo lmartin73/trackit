@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import { attemptLoginWithEmail } from '../../../components/user/UserActions'
-import { AUTHENTICATED, GUEST } from '../../../components/user/UserConstants'
+import { AUTHENTICATED, GUEST, AWAITING_AUTHENTICATION } from '../../../components/user/UserConstants'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
+import { smallBox } from "../../../components/utils/actions/MessageActions";
 
 
 const mapStateToProps = (state) => {
@@ -17,7 +18,8 @@ const mapStateToProps = (state) => {
         - authState: current authentication status
     */
     return {
-        authState: state.user.AUTH_STATE
+        authState: state.user.AUTH_STATE,
+        isLogging: state.user.isLogging
     }
 }
 
@@ -32,7 +34,16 @@ const mapDispatchToProps = (dispatch) => {
         attemptLogin: (email, password) => {
             dispatch(attemptLoginWithEmail(email, password))
         },
-        loginSuccess: () => {dispatch(push('#/dashboard'))}
+        loginSuccess: () => {
+            dispatch(push('#/dashboard'))
+            smallBox({
+                title: "Signed In!",
+                content: "<i class='fa fa-clock-o'></i> <i>Welcome back to TrackIt!</i>",
+                color: "#659265",
+                iconSmall: "fa fa-check fa-2x fadeInRight animated",
+                timeout: 4000
+            });
+        }
     }
 }
 
@@ -45,8 +56,9 @@ class Login extends React.Component {
             - If state changed to authenticated, user is logged in
             - If state is not changed to authenticated, do nothing
         */
-        if (props.authState === AUTHENTICATED) {
+        if (props.authState === AUTHENTICATED && !props.isLogging) {
             this.props.loginSuccess()
+
         } else if (props.authState === GUEST) {
             // Todo: Error message
         }
@@ -92,6 +104,17 @@ class Login extends React.Component {
     }
 
     render() {
+        if (this.props.isLogging) {
+            return (
+                <div>
+                    <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
+                    </div><br/>
+                    <p className="text-center text-muted">Loading account...</p>
+                </div>
+            )
+        }
+
         return (
             <div id="extr-page">
                 <header id="header" className="animated fadeInDown">
@@ -155,7 +178,5 @@ class Login extends React.Component {
     }
 }
 
-
 // Use connect method to connect redux store to Login component
 export default connect(mapStateToProps, mapDispatchToProps)(Login)
-

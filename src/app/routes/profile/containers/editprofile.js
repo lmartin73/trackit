@@ -1,24 +1,57 @@
 import React from 'react'
 import { push } from 'react-router-redux'
-import store from '../../../store/configureStore'
+import { connect } from 'react-redux'
 import countries from '../../../components/forms/commons/countries'
 import { phoneTypes, addressTypes, fileDefs }  from '../../../components/forms/commons/form_defines'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import JarvisWidget from '../../../components/widgets/JarvisWidget'
-import { bigBox } from "../../../components/utils/actions/MessageActions";
-import '../../../../../node_modules/jquery.maskedinput/src/jquery.maskedinput.js'
+import { smallBox } from "../../../components/utils/actions/MessageActions";
+import { updateUserProfile } from './ProfileActions'
+import { PROFILE_UPDATED } from './ProfileConstants'
 
 
-export default class EditProfile extends React.Component {
+const mapStateToProps = (state) => {
+    /*
+        Maps redux states to local props
+
+        - method is called everytime state is updated/changed
+        - profile: current user profile
+        - profile_loading: boolean if profile is loading or not
+        - profile_state: current state of the profile
+    */
+    return {
+        profile: state.profile.profile,
+        profile_loading: state.profile.isLoading,
+        profile_state: state.profile.profile_state
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    /*
+        Maps the redux dispatch calls to local props
+
+        - update_profile: dispatch update user profile action
+        - back_to_profile: redirects to profile route
+    */
+    return {
+        update_profile: (profile) => {dispatch(updateUserProfile(profile))},
+        back_to_profile: () => {dispatch(push('settings/profile'))}
+    }
+}
+
+class EditProfile extends React.Component {
     /*
         Allows user to edit their profile information
-
-        - Todo: add proper input masking
     */
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         // Bind methods to this
         this.photoHandler = this.photoHandler.bind(this);
+        this.onChange = this.onInputChange.bind(this);
+
+        this.state = this.props.profile
+
+        // form validation options
         this.validationOptions = {
             // Rules for validation
             rules: {
@@ -35,7 +68,7 @@ export default class EditProfile extends React.Component {
                 phone: {
                     required: true
                 },
-                phonetype: {
+                phone_type: {
                     required: true
                 },
                 street1: {
@@ -57,7 +90,7 @@ export default class EditProfile extends React.Component {
                 country: {
                     required: true
                 },
-                addresstype: {
+                address_type: {
                     required: true
                 }
             },
@@ -76,7 +109,7 @@ export default class EditProfile extends React.Component {
                 phone: {
                     required: "Phone Number Required"
                 },
-                phonetype: {
+                phone_type: {
                     required: "Phone Type Required"
                 },
                 street1: {
@@ -94,20 +127,36 @@ export default class EditProfile extends React.Component {
                 country: {
                     required: "Country Required"
                 },
-                addresstype: {
+                address_type: {
                     required: "Address Type Required"
                 }
             },
             submitHandler: function(form) {
                 /*
                     Form validation is successful at this point
-
-                    - Todo: save changes to profile
-                    - this.refs
-                    - store.dispatch(push('settings/profile'));
                 */
+                console.log(this.state)
+                this.props.update_profile(this.state)
             }.bind(this)
         };
+    }
+
+    componentWillReceiveProps(newprops) {
+        /*
+            Used as a handler for profile updated changes
+
+            - If profile state is profile_updated, call back_to_profile
+        */
+        if (newprops.profile_state === PROFILE_UPDATED) {
+            this.props.back_to_profile()
+            smallBox({
+                title: "Successful!",
+                content: "<i class='fa fa-clock-o'></i> <i>Profile updated!</i>",
+                color: "#659265",
+                iconSmall: "fa fa-check fa-2x fadeInRight animated",
+                timeout: 4000
+            });
+        }
     }
 
     photoHandler(event) {
@@ -120,7 +169,7 @@ export default class EditProfile extends React.Component {
         event.preventDefault();
         var reader = new FileReader();
         reader.onload = function (e) {
-            this.refs.image.src = e.target.result;
+            this.setState({photoURL: e.target.result});
         }.bind(this)
         if (this.refs.imageSelect.files.length == fileDefs.SELECTED_FILES_COUNT) {
             var file = this.refs.imageSelect.files[fileDefs.SELECTED_FILE_INDEX];
@@ -128,43 +177,63 @@ export default class EditProfile extends React.Component {
                 reader.readAsDataURL(file);
             } else {
                 // Custom alert box if file too large
-                bigBox({
-                    title: "Error!",
-                    content: "Photo too large to upload. Please select another photo...",
+                smallBox({
+                    title: "Alert!",
+                    content: "<i class='fa fa-clock-o'></i> <i>Photo too large. Please choose another one.</i>",
                     color: "#C46A69",
-                    icon: "fa fa-warning shake animated",
-                    timeout: ALERT_TIMEOUT
+                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
+                    timeout: 4000
                 });
             }
         }
     }
 
     onInputChange(event) {
+        /*
+            Used for input masking (phone and state)
+
+            - If phone has 7 digits, adds dash
+            - If phone has 10 digits, adds parenthesis and dash
+            - Convert state to uppercase
+        */
         event.preventDefault();
         var value = event.target.value;
-        if (event.target.name == "phone") {
+        var name = event.target.name;
 
+        if (name == "phone") {
             // Remove any unneccessary characters
             value = value.replace(/[^\d]/g, '');
             if (value.length == 7) {
-
                 // Format phone string with middle dash
                 value = value.replace(/(\d{3})(\d{4})/, "$1-$2");
             } else if (value.length == 10) {
-
                 // Format phone strong with parenthesis and middle dash
                 value = value.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2-$3");
             }
             event.target.value = value;
-        } else if (event.target.name == "state") {
 
-            // Convert state to all uppercase
+        } else if (name == "state") {
             value = value.toUpperCase();
             event.target.value = value;
         }
+
+        var new_state = {};
+        new_state[name] = value;
+        this.setState(new_state);
     }
 
     render() {
+        if (this.props.profile_loading) {
+            return(
+                <div>
+                    <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+                        <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
+                    </div><br/>
+                    <p className="text-center text-muted">Loading profile...</p>
+                </div>
+            )
+        }
+
         return(
             <div id="content">
                 <br/>
@@ -183,10 +252,10 @@ export default class EditProfile extends React.Component {
                                                 <div className="row">
                                                     <div className="text-center">
                                                         <div className="">
-                                                            <img className="img-thumbnail" style={{objectFit: 'cover', height: "120px", width: "120px"}} src="assets/img/avatars/user.png"/><br/>
+                                                            <img className="img-thumbnail" name="image" ref="image" style={{objectFit: 'cover', height: "120px", width: "120px"}} src={this.state.photoURL}/><br/>
                                                         </div>
                                                         <label className="btn btn-link">Select Photo
-                                                            <input type="file" style={{display: 'none'}} onChange={this.photoHandler}/>
+                                                            <input type="file" name="imageSelect" ref="imageSelect" style={{display: 'none'}} onChange={this.photoHandler}/>
                                                         </label><br/><br/>
                                                     </div>
                                                 </div>
@@ -194,12 +263,12 @@ export default class EditProfile extends React.Component {
                                                 <div className="row">
                                                     <section className="col col-6">
                                                         <label className="input"> <i className="icon-prepend fa fa-user"/>
-                                                            <input type="text" name="firstname" ref="firstname" placeholder="First Name" defaultValue={""}/>
+                                                            <input type="text" name="firstname" ref="firstname" placeholder="First Name" defaultValue={this.state.firstname} onChange={this.onChange}/>
                                                         </label>
                                                     </section>
                                                     <section className="col col-6">
                                                         <label className="input"> <i className="icon-prepend fa fa-user"/>
-                                                            <input type="text" name="lastname" ref="lastname" placeholder="Last Name" defaultValue={""}/>
+                                                            <input type="text" name="lastname" ref="lastname" placeholder="Last Name" defaultValue={this.state.lastname} onChange={this.onChange}/>
                                                         </label>
                                                     </section>
                                                 </div>
@@ -208,7 +277,7 @@ export default class EditProfile extends React.Component {
                                                 <section>
                                                     <br/>
                                                     <label className="input"> <i className="icon-prepend fa fa-envelope-o"/>
-                                                        <input type="email" name="email" ref="email" placeholder="Email" defaultValue={""}/>
+                                                        <input type="email" name="email" ref="email" placeholder="Email" defaultValue={this.state.email} onChange={this.onChange}/>
                                                     </label>
                                                 </section>
                                             </fieldset>
@@ -217,12 +286,12 @@ export default class EditProfile extends React.Component {
                                                 <div className="row">
                                                     <section className="col col-8">
                                                             <label className="input"> <i className="icon-prepend fa fa-phone"/>
-                                                                <input type="tel" name="phone" ref="phone" id="phone" placeholder="Phone" defaultValue={""} onChange={this.onChange} />
+                                                                <input type="tel" name="phone" ref="phone" id="phone" placeholder="Phone" defaultValue={this.state.phone} onChange={this.onChange} />
                                                             </label>
                                                     </section>
                                                     <section className="col col-4">
                                                         <label className="select">
-                                                            <select name="phonetype" ref="phonetype" defaultValue={""}>
+                                                            <select name="phone_type" ref="phone_type" defaultValue={this.state.phone_type} onChange={this.onChange}>
                                                                 <option value="" disabled>Phone Type</option>
                                                                 {phoneTypes.map(function(type) {
                                                                         return(
@@ -240,36 +309,36 @@ export default class EditProfile extends React.Component {
                                                 <div className="row">
                                                     <section className="col col-6">
                                                             <label className="input">
-                                                                <input type="text" name="street1" ref="street1" placeholder="Street 1" defaultValue={""}/>
+                                                                <input type="text" name="street1" ref="street1" placeholder="Street 1" defaultValue={this.state.street1} onChange={this.onChange}/>
                                                             </label>
                                                     </section>
                                                     <section className="col col-6">
                                                         <label className="input">
-                                                            <input type="text" name="street2" ref="street2" placeholder="Street 2" defaultValue={""}/>
+                                                            <input type="text" name="street2" ref="street2" placeholder="Street 2" defaultValue={this.state.street2} onChange={this.onChange}/>
                                                         </label>
                                                     </section>
                                                 </div>
                                                 <div className="row">
                                                     <section className="col col-6">
                                                         <label className="input">
-                                                            <input type="text" name="city" ref="city" placeholder="City" defaultValue={""}/>
+                                                            <input type="text" name="city" ref="city" placeholder="City" defaultValue={this.state.city} onChange={this.onChange}/>
                                                         </label>
                                                     </section>
                                                     <section className="col col-2">
                                                         <label className="input">
-                                                            <input type="text" name="state" ref="state" id="state" placeholder="State" defaultValue={""} onChange={this.onChange}/>
+                                                            <input type="text" name="state" ref="state" id="state" placeholder="State" defaultValue={this.state.state} onChange={this.onChange} onChange={this.onChange}/>
                                                         </label>
                                                     </section>
                                                     <section className="col col-4">
                                                         <label className="input">
-                                                            <input type="text" name="zip" id="zip" ref="zip" placeholder="Zip" defaultValue={""}/>
+                                                            <input type="text" name="zip" id="zip" ref="zip" placeholder="Zip" defaultValue={this.state.zip} onChange={this.onChange}/>
                                                         </label>
                                                     </section>
                                                 </div>
                                                 <div className="row">
                                                     <section className="col col-8">
                                                         <label className="select">
-                                                            <select name="country" ref="country" defaultValue={""}>
+                                                            <select name="country" ref="country" defaultValue={this.state.country} onChange={this.onChange}>
                                                                 <option value="" disabled>Country</option>
                                                                     {countries.map((country)=>{
                                                                         return <option key={country.key} value={country.value}>{country.value}</option>
@@ -280,7 +349,7 @@ export default class EditProfile extends React.Component {
                                                     </section>
                                                     <section className="col col-4">
                                                         <label className="select">
-                                                            <select name="addresstype" ref="addresstype" defaultValue={""}>
+                                                            <select name="address_type" ref="address_type" defaultValue={this.state.address_type} onChange={this.onChange}>
                                                                 <option value="" disabled>Address Type</option>
                                                                 {addressTypes.map(function(type) {
                                                                         return(
@@ -311,3 +380,6 @@ export default class EditProfile extends React.Component {
         )
     }
 };
+
+// Connect state and dispatch to component props
+export default connect(mapStateToProps, mapDispatchToProps)(EditProfile)
