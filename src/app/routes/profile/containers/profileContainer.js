@@ -32,7 +32,7 @@ const mapDispatchToProps = (dispatch) => {
         - loginSuccess: redirects to main webpage (dashboard)
     */
     return {
-        go_to_edit_profile: () => {dispatch(push('settings/editprofile'))}
+        go_to_edit_profile: () => {dispatch(push('myaccount/editprofile'))}
     }
 }
 

@@ -30,7 +30,8 @@ const mapStateToProps = (state) => {
     */
     return {
         authState: state.user.AUTH_STATE,
-        isLogging: state.user.isLogging
+        isLogging: state.user.isLogging,
+        profile: state.profile.profile
     }
 }
 
@@ -42,6 +43,7 @@ const mapDispatchToProps = (dispatch) => {
     */
     return {
         logoutUser: () => {dispatch(logoutUser())},
+        dispatch: (path) => {dispatch(push(path))}
     }
 }
 
@@ -115,7 +117,7 @@ class Header extends React.Component {
               </li>
               <li className="divider"/>
               <li>
-                <a href="#/views/profile"
+                <a onClick={() => {this.props.dispatch('/myaccount/profile')}}
                    className="padding-10 padding-top-0 padding-bottom-0"> <i className="fa fa-user"/>
                   <u>P</u>rofile</a>
               </li>

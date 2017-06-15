@@ -4,9 +4,9 @@ import React from 'react';
     list of routes for profile components
 */
 export default {
-    path: 'settings',
+    path: 'myaccount',
     component: require('../../components/common/Layout').default,
-    indexRoute: { onEnter: (nextState, replace) => replace('/settings/profile') },
+    indexRoute: { onEnter: (nextState, replace) => replace('/myaccount/profile') },
     childRoutes: [
         {
             path: 'profile',

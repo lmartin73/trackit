@@ -32,9 +32,15 @@
       ]
     },
     {
-      "title": "My Profile",
-      "icon": "fa fa-lg fa-fw fa-user",
-      "route": "settings/profile"
+      "title": "My Account",
+      "icon": "fa fa-lg fa-fw fa-cogs",
+      "items": [
+        {
+          "title": "Profile",
+          "route": "/myaccount/profile",
+          "icon": "fa fa-user"
+        }
+      ]
     },
     {
       "title": "Outlook",

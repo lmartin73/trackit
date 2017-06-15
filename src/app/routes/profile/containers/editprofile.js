@@ -35,7 +35,7 @@ const mapDispatchToProps = (dispatch) => {
     */
     return {
         update_profile: (profile) => {dispatch(updateUserProfile(profile))},
-        back_to_profile: () => {dispatch(push('settings/profile'))}
+        back_to_profile: () => {dispatch(push('myaccount/profile'))}
     }
 }
 
