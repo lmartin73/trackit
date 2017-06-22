@@ -1,5 +1,4 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import { push } from 'react-router-redux'
 import { attemptLoginWithEmail } from '../../../components/user/UserActions'
@@ -9,11 +8,11 @@ import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 import { smallBox } from "../../../components/utils/actions/MessageActions";
 
+var sha256 = require('js-sha256');
 
 const mapStateToProps = (state) => {
     /*
         Maps redux states to local props
-
         - method is called everytime state is updated/changed
         - authState: current authentication status
     */
@@ -26,7 +25,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     /*
         Maps the redux dispatch calls to local props
-
         - attemptLogin: method to attempt to log in user
         - loginSuccess: redirects to main webpage (dashboard)
     */
@@ -35,6 +33,7 @@ const mapDispatchToProps = (dispatch) => {
             dispatch(attemptLoginWithEmail(email, password))
         },
         loginSuccess: () => {
+            // Method to route to dashboard and show successful login message
             dispatch(push('/dashboard'))
             smallBox({
                 title: "Signed In!",
@@ -48,6 +47,7 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 class Login extends React.Component {
+    /* Login component for user authentication */
 
     componentWillReceiveProps(props) {
         /*
@@ -66,6 +66,16 @@ class Login extends React.Component {
 
     constructor(props) {
         super(props);
+        // Bind methods to 'this' pointer
+        this.onInputValueChanged = this.onInputValueChanged.bind(this);
+
+        // Initialize local state
+        this.state = {
+            auth: {
+                email: '',
+                password: sha256('')
+            }
+        };
 
         // login form validation options
         this.validationOptions = {
@@ -93,14 +103,26 @@ class Login extends React.Component {
                 /*
                     All validation has been successful
                     Attempt to log in user
-
-                    - data:
-                        email: this.refs.email.value
-                        password: this.refs.password.value
                 */
-                this.props.attemptLogin(this.refs.email.value, this.refs.password.value)
+                this.props.attemptLogin(this.state.auth.email, this.state.auth.password)
             }.bind(this)
         };
+    }
+
+    onInputValueChanged(event) {
+        /*
+            Method used to update state in correspondence with input fields when modified
+            - Update email field in state when email input is changed
+            - Update password hash in state when password input is changed
+        */
+        event.preventDefault();
+        var newState = {};
+        if (event.target.name === 'password') {
+            newState = {auth: {...this.state.auth, password: sha256(event.target.value)}};
+        } else if (event.target.name === 'email') {
+            newState = {auth: {...this.state.auth, email: event.target.value}};
+        }
+        this.setState(newState);
     }
 
     render() {
@@ -141,14 +163,14 @@ class Login extends React.Component {
                                                 <section>
                                                     <label className="label">E-mail</label>
                                                     <label className="input"> <i className="icon-append fa fa-user"/>
-                                                    <input type="email" name="email" ref="email" />
+                                                    <input type="email" name="email" onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-top-right"><i className="fa fa-user txt-color-teal"/>
                                                         Please enter your email address.</b></label>
                                                 </section>
                                                 <section>
                                                     <label className="label">Password</label>
                                                     <label className="input"> <i className="icon-append fa fa-lock"/>
-                                                    <input type="password" name="password" ref="password" />
+                                                    <input type="password" name="password" onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-top-right"><i className="fa fa-lock txt-color-teal"/>
                                                         Please enter your password.</b></label>
                                                     <div className="note">
