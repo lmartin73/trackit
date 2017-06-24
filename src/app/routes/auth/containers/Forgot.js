@@ -1,18 +1,41 @@
 import React from 'react'
-import ReactDOM from 'react-dom';
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
+import * as firebase from 'firebase'
+import { smallBox } from "../../../components/utils/actions/MessageActions";
 
-export default class Forgot extends React.Component {
+
+const mapStateToProps = (state) => {
+    return {}
+}
+
+const mapDispatchToProps = (dispatch) => {
     /*
-        Allows user to reset their password
-
-        - Retrieves user email
-        - Sends password reset email to user, to reset with given link
+        Maps the redux dispatch calls to local props
+        - goBackToLogin: redirects to Login page
     */
-    constructor() {
-        super();
+    return {
+        goBackToLogin: () => {
+            dispatch(push('/login'))
+            smallBox({
+                title: "Success!",
+                content: "<i class='fa fa-clock-o'></i> <i>Password recovery email has been sent!</i>",
+                color: "#659265",
+                iconSmall: "fa fa-check fa-2x fadeInRight animated",
+                timeout: 4000
+            });
+        }
+    }
+}
+
+class Forgot extends React.Component {
+    /* Allows user to reset their password */
+
+    constructor(props) {
+        super(props);
         // form validation options
         this.validationOptions = {
             // Rules for input fields
@@ -31,10 +54,12 @@ export default class Forgot extends React.Component {
             },
             submitHandler: function(form) {
                 /*
-                    All form validation is successful
-
-                    - Todo: Send password recovery email
+                    Send password recovery email and nagivate back to login page
                 */
+                firebase.auth().sendPasswordResetEmail(this.refs.email.value).catch(function(error) {
+                    // Todo: Error handling
+                });
+                this.props.goBackToLogin();
             }.bind(this)
         };
     }
@@ -91,3 +116,6 @@ export default class Forgot extends React.Component {
         )
     }
 }
+
+// Use connect method to connect redux store to Login component
+export default connect(mapStateToProps, mapDispatchToProps)(Forgot)

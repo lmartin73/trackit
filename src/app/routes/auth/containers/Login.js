@@ -118,6 +118,7 @@ class Login extends React.Component {
         event.preventDefault();
         var newState = {};
         if (event.target.name === 'password') {
+            // Hash new password
             newState = {auth: {...this.state.auth, password: sha256(event.target.value)}};
         } else if (event.target.name === 'email') {
             newState = {auth: {...this.state.auth, email: event.target.value}};
