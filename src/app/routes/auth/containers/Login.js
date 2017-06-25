@@ -6,7 +6,7 @@ import { AUTHENTICATED, GUEST, AWAITING_AUTHENTICATION } from '../../../componen
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
-import { smallBox } from "../../../components/utils/actions/MessageActions";
+import { smallAlertMessage } from "../../../components/alert-messaging/AlertMessaging";
 
 var sha256 = require('js-sha256');
 
@@ -34,14 +34,12 @@ const mapDispatchToProps = (dispatch) => {
         },
         loginSuccess: () => {
             // Method to route to dashboard and show successful login message
+            message_title = 'Login Successful!'
+            message_description = 'Welcome back to TrackIt!'
+            type = 'success'
+
             dispatch(push('/dashboard'))
-            smallBox({
-                title: "Signed In!",
-                content: "<i class='fa fa-clock-o'></i> <i>Welcome back to TrackIt!</i>",
-                color: "#659265",
-                iconSmall: "fa fa-check fa-2x fadeInRight animated",
-                timeout: 4000
-            });
+            smallAlertMessage(message_title, message_description, type)
         }
     }
 }

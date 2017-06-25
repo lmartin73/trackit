@@ -5,7 +5,7 @@ import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 import * as firebase from 'firebase'
-import { smallBox } from "../../../components/utils/actions/MessageActions";
+import { smallAlertMessage } from "../../../components/alert-messaging/AlertMessaging";
 
 
 const mapStateToProps = (state) => {
@@ -19,14 +19,12 @@ const mapDispatchToProps = (dispatch) => {
     */
     return {
         goBackToLogin: () => {
+            message_title = 'Email delivered'
+            message_description = 'Password recovery email has been sent!'
+            type = 'success'
+
             dispatch(push('/login'))
-            smallBox({
-                title: "Success!",
-                content: "<i class='fa fa-clock-o'></i> <i>Password recovery email has been sent!</i>",
-                color: "#659265",
-                iconSmall: "fa fa-check fa-2x fadeInRight animated",
-                timeout: 4000
-            });
+            smallAlertMessage(message_title, message_description, type)
         }
     }
 }
