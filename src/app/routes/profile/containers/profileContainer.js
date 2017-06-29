@@ -3,6 +3,7 @@ import { push } from 'react-router-redux'
 import { months } from '../../../components/forms/commons/months'
 import { Profile } from '../components/profile'
 import { connect } from 'react-redux'
+import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 
 
 // Current date displayed on profile (Date string)
@@ -12,9 +13,9 @@ var date_str = months[current_date.getMonth()] + " " + current_date.getDay() + "
 const mapStateToProps = (state) => {
     /*
         Maps redux states to local props
-
-        - method is called everytime state is updated/changed
-        - authState: current authentication status
+        - profile: user profile object
+        - profile_loading: boolean for whether the profile is loading or not
+        - profile_state: current state of the profile
     */
     return {
         profile: state.profile.profile,
@@ -24,12 +25,9 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    //console.log(dispatch)
     /*
         Maps the redux dispatch calls to local props
-
-        - attemptLogin: method to attempt to log in user
-        - loginSuccess: redirects to main webpage (dashboard)
+        - go_to_edit_profile: method to dispatch to editprofile route
     */
     return {
         go_to_edit_profile: () => {dispatch(push('myaccount/editprofile'))}
@@ -39,9 +37,6 @@ const mapDispatchToProps = (dispatch) => {
 class ProfileContainer extends React.Component {
     /*
         Container component for profile
-
-        - Loads profile data, and any other data needed
-        - Renders profile dummy component, passing in data as props
     */
     constructor() {
         super();
@@ -57,15 +52,9 @@ class ProfileContainer extends React.Component {
     }
 
     render() {
+        // Show loading spinner with specified text if profile loading
         if (this.props.profile_loading) {
-            return(
-                <div>
-                    <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
-                    </div><br/>
-                    <p className="text-center text-muted">Loading profile...</p>
-                </div>
-            )
+            return <LoadingSpinner text='Loading profile...'>
         }
 
         return(

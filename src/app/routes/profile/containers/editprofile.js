@@ -5,16 +5,15 @@ import countries from '../../../components/forms/commons/countries'
 import { phoneTypes, addressTypes, fileDefs }  from '../../../components/forms/commons/form_defines'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import JarvisWidget from '../../../components/widgets/JarvisWidget'
-import { smallBox } from "../../../components/utils/actions/MessageActions";
+import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
 import { updateUserProfile } from './ProfileActions'
+import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 import { PROFILE_UPDATED } from './ProfileConstants'
 
 
 const mapStateToProps = (state) => {
     /*
         Maps redux states to local props
-
-        - method is called everytime state is updated/changed
         - profile: current user profile
         - profile_loading: boolean if profile is loading or not
         - profile_state: current state of the profile
@@ -29,7 +28,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     /*
         Maps the redux dispatch calls to local props
-
         - update_profile: dispatch update user profile action
         - back_to_profile: redirects to profile route
     */
@@ -49,11 +47,13 @@ class EditProfile extends React.Component {
         this.photoHandler = this.photoHandler.bind(this);
         this.onChange = this.onInputChange.bind(this);
 
-        this.state = this.props.profile
+        // Initialize local state
+        this.state = {
+            profile: this.props.profile
+        }
 
         // form validation options
         this.validationOptions = {
-            // Rules for validation
             rules: {
                 firstname: {
                     required: true
@@ -135,8 +135,7 @@ class EditProfile extends React.Component {
                 /*
                     Form validation is successful at this point
                 */
-                console.log(this.state)
-                this.props.update_profile(this.state)
+                this.props.update_profile(this.state.profile)
             }.bind(this)
         };
     }
@@ -144,32 +143,26 @@ class EditProfile extends React.Component {
     componentWillReceiveProps(newprops) {
         /*
             Used as a handler for profile updated changes
-
             - If profile state is profile_updated, call back_to_profile
         */
         if (newprops.profile_state === PROFILE_UPDATED) {
+            var message_title = 'Successful'
+            var message_description = 'Profile updated!'
+            var type = 'success'
             this.props.back_to_profile()
-            smallBox({
-                title: "Successful!",
-                content: "<i class='fa fa-clock-o'></i> <i>Profile updated!</i>",
-                color: "#659265",
-                iconSmall: "fa fa-check fa-2x fadeInRight animated",
-                timeout: 4000
-            });
+            smallAlertMessage(message_title, message_description, type)
         }
     }
 
     photoHandler(event) {
         /*
             Method handler when new photo is selected for profile image
-
             - Todo: Fix image rendering issue. Some iamges render rotated 90 deg, due to image metadata
-            - Method may be best being more global, since functionality is used by multiple components
         */
         event.preventDefault();
         var reader = new FileReader();
         reader.onload = function (e) {
-            this.setState({photoURL: e.target.result});
+            this.setState({profile: {photoURL: e.target.result}});
         }.bind(this)
         if (this.refs.imageSelect.files.length == fileDefs.SELECTED_FILES_COUNT) {
             var file = this.refs.imageSelect.files[fileDefs.SELECTED_FILE_INDEX];
@@ -177,13 +170,10 @@ class EditProfile extends React.Component {
                 reader.readAsDataURL(file);
             } else {
                 // Custom alert box if file too large
-                smallBox({
-                    title: "Alert!",
-                    content: "<i class='fa fa-clock-o'></i> <i>Photo too large. Please choose another one.</i>",
-                    color: "#C46A69",
-                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
-                    timeout: 4000
-                });
+                var message_title = 'Alert!'
+                var message_description = 'Photo too large. Please choose another one.'
+                var type = 'danger'
+                smallAlertMessage(message_title, message_description, type)
             }
         }
     }
@@ -197,10 +187,10 @@ class EditProfile extends React.Component {
             - Convert state to uppercase
         */
         event.preventDefault();
+        var profile_key = 'profile';
         var value = event.target.value;
-        var name = event.target.name;
 
-        if (name == "phone") {
+        if (event.target.name == "phone") {
             // Remove any unneccessary characters
             value = value.replace(/[^\d]/g, '');
             if (value.length == 7) {
@@ -212,26 +202,20 @@ class EditProfile extends React.Component {
             }
             event.target.value = value;
 
-        } else if (name == "state") {
+        } else if (event.target.name == "state") {
             value = value.toUpperCase();
             event.target.value = value;
         }
-
-        var new_state = {};
-        new_state[name] = value;
+        // Update state
+        var new_state = {profile: {...this.state.profile}};
+        new_state[profile_key][event.target.name] = value;
         this.setState(new_state);
     }
 
     render() {
+        // Show loading spinner with specified text if profile is loading/updating
         if (this.props.profile_loading) {
-            return(
-                <div>
-                    <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
-                    </div><br/>
-                    <p className="text-center text-muted">Loading profile...</p>
-                </div>
-            )
+            return <LoadingSpinner text='Saving profile...'>
         }
 
         return(
