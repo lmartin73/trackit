@@ -65,11 +65,8 @@ export function createProfileWithEmailAction(newUserData){
         //initialize new profile on remote server
         currentProfile.createProfileViaEmail(newUserData.firstname, newUserData.lastname, newUserData.email, newUserData.uid)
 
-        //fetch new profile into store
-        dispatch({
-            type:ProfileConstants.FETCH_PROFILE,
-            profile: null
-        })
+        //load user profile
+        dispatch(loadUserProfile(newUserData.uid))
     }
 }
 

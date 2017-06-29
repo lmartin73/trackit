@@ -9,14 +9,18 @@ import { bigBox } from "../../../components/utils/actions/MessageActions";
 import { WelcomeContent } from '../components/WelcomeContent'
 import { push } from 'react-router-redux'
 import { connect } from 'react-redux'
+import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
+import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
+import { updateUserProfile } from '../../profile/containers/ProfileActions'
+import { PROFILE_UPDATED } from '../../profile/containers/ProfileConstants'
 
 
 const mapStateToProps = (state) => {
     /*
         Maps redux states to local props
-
-        - method is called everytime state is updated/changed
-        - authState: current authentication status
+        - profile: user profile object
+        - profile_loading: boolean for whether the profile is loading or not
+        - profile_state: current state of the profile
     */
     return {
         profile: state.profile.profile,
@@ -26,16 +30,14 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    //console.log(dispatch)
     /*
         Maps the redux dispatch calls to local props
-
-        - attemptLogin: method to attempt to log in user
-        - loginSuccess: redirects to main webpage (dashboard)
+        - update_profile: method to update profile with new profile information
+        - dispatch_route: method to dispatch a new route
     */
     return {
         update_profile: (profile) => {dispatch(updateUserProfile(profile))},
-        go_to_dashboard: () => {dispatch(push('/dashboard'))}
+        dispatch_route: (route) => {dispatch(push(route))}
     }
 }
 
@@ -43,27 +45,30 @@ class CreateProfile extends React.Component {
     /*
         Allows user to set up their profile after registering
     */
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         // Bind methods to this pointer
-        this.onComplete= this.onWizardComplete.bind(this);
+        this.updateProfileHandler= this.updateProfileHandler.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
         this.photoHandler = this.photoHandler.bind(this);
 
+        // Initialize local state
         this.state = {
-            firstname: this.props.profile.firstname,
-            lastname: this.props.profile.lastname,
-            email: this.props.profile.email,
-            phone: "",
-            phone_type: "",
-            street1: "",
-            street2: "",
-            city: "",
-            state: "",
-            zip: "",
-            country: "",
-            address_type: "",
-            photoURL: ""
+            profile: {
+                firstname: this.props.profile.firstname,
+                lastname: this.props.profile.lastname,
+                email: this.props.profile.email,
+                phone: '',
+                phone_type: '',
+                street1: '',
+                street2: '',
+                city: '',
+                state: '',
+                zip: '',
+                country: '',
+                address_type: '',
+                photoURL: ''
+            }
         };
 
         // Form validation options
@@ -160,53 +165,45 @@ class CreateProfile extends React.Component {
     componentWillReceiveProps(newprops) {
         /*
             Used as a handler for profile updated changes
-
-            - If profile state is profile_updated, call back_to_profile
         */
         if (newprops.profile_state === PROFILE_UPDATED) {
-            this.props.go_to_dashboard()
-            smallBox({
-                title: "Successful!",
-                content: "<i class='fa fa-clock-o'></i> <i>Welcome to Trackit!</i>",
-                color: "#659265",
-                iconSmall: "fa fa-check fa-2x fadeInRight animated",
-                timeout: 4000
-            });
+            var message_title = 'Profile Created!'
+            var message_description = 'Account Setup Complete!'
+            var type = 'success'
+
+            this.props.dispatch_route('/dashboard')
+            smallAlertMessage(message_title, message_description, type)
         }
     }
 
-    onWizardComplete(data){
+    updateProfileHandler(data){
         /*
-            Todo: update user profile
-            - navigate to dashboard
+            update user profile
+            - Data is stored in this.state.profile
         */
-        this.props.update_profile(this.state);
+        this.props.update_profile(this.state.profile);
     }
 
     photoHandler(event) {
         /*
             Handler for when user selects new photo for profile picture
-
             - Todo: Fix image rendering issue. Some images render rotated 90 deg, due to image metadata
         */
         event.preventDefault();
         var reader = new FileReader();
         reader.onload = function (e) {
-            this.setState({photoURL: e.target.result});
+            this.setState({profile: {photoURL: e.target.result}});
         }.bind(this)
         if (this.refs.imageSelect.files.length == fileDefs.SELECTED_FILES_COUNT) {
             var file = this.refs.imageSelect.files[fileDefs.SELECTED_FILE_INDEX];
             if (file.size <= fileDefs.MAX_FILE_SIZE) {
                 reader.readAsDataURL(file);
             } else {
-                // Custom alert box if file too large
-                smallBox({
-                    title: "Callback function",
-                    content: "<i class='fa fa-clock-o'></i> <i>Photo too large. Please choose another one.</i>",
-                    color: "#C46A69",
-                    iconSmall: "fa fa-times fa-2x fadeInRight animated",
-                    timeout: 4000
-                });
+                // show Error message alert box
+                var message_title = 'Error!'
+                var message_description = 'Photo too large. Please select another one.'
+                var type = 'danger'
+                smallAlertMessage(message_title, message_description, type)
             }
         }
     }
@@ -214,9 +211,10 @@ class CreateProfile extends React.Component {
     onInputChange(event) {
         /*
             Masks input fields (if needed) as user types
-            and updates state
+            and updates local state
         */
         event.preventDefault();
+        var profile_key = 'profile';
         var value = event.target.value;
         if (event.target.name == "phone") {
 
@@ -239,21 +237,15 @@ class CreateProfile extends React.Component {
             event.target.value = value;
         }
         // Update state
-        var new_state = {};
-        new_state[event.target.name] = value;
+        var new_state = {profile: {...this.state.profile}};
+        new_state[profile_key][event.target.name] = value;
         this.setState(new_state);
     }
 
     render() {
+        // Show loading spinner with specific text if profile is loading
         if (this.props.profile_loading) {
-            return(
-                <div>
-                    <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
-                    </div><br/>
-                    <p className="text-center text-muted">Saving profile...</p>
-                </div>
-            )
+            return <LoadingSpinner text='Saving your profile...' />
         }
 
         return(
@@ -262,7 +254,7 @@ class CreateProfile extends React.Component {
                     <div id="logo-group">
                         <span id="logo"><div><h1 className="logo-name text-center">TrackIt+</h1></div></span>
                     </div>
-                    <span id="extr-page-header-space"><span>Welcome, {this.state.firstname}!</span></span>
+                    <span id="extr-page-header-space"><span>Welcome, {this.state.profile.firstname}!</span></span>
                 </header>
                 <div id="main" role="main" className="animated fadeInDown">
                     <div id="content" className="container">
@@ -283,7 +275,7 @@ class CreateProfile extends React.Component {
                                                     <div className="row">
                                                         <UiValidate options={this.validateOptions}>
                                                             <form noValidate="novalidate">
-                                                                <Wizard className="col-sm-12" onComplete={this.onComplete}>
+                                                                <Wizard className="col-sm-12" onComplete={this.updateProfileHandler}>
                                                                     <div className="form-bootstrapWizard clearfix">
                                                                         <ul className="bootstrapWizard">
                                                                             <li data-smart-wizard-tab="1">
@@ -311,7 +303,7 @@ class CreateProfile extends React.Component {
                                                                                             <span className="input-group-addon"><i className="fa fa-user fa-lg fa-fw"/></span>
                                                                                             <input className="form-control" type="text" name="firstname"
                                                                                                                             ref="firstname" placeholder="First Name"
-                                                                                                                            value={this.state.firstname} onChange={this.onInputChange}/>
+                                                                                                                            value={this.state.profile.firstname} onChange={this.onInputChange}/>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -321,7 +313,7 @@ class CreateProfile extends React.Component {
                                                                                             <span className="input-group-addon"><i className="fa fa-user fa-lg fa-fw"/></span>
                                                                                             <input className="form-control" type="text" name="lastname"
                                                                                                                             ref="lastname" placeholder="Last Name"
-                                                                                                                            value={this.state.lastname} onChange={this.onInputChange}/>
+                                                                                                                            value={this.state.profile.lastname} onChange={this.onInputChange}/>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -334,7 +326,7 @@ class CreateProfile extends React.Component {
                                                                                             <span className="input-group-addon"><i className="fa fa-envelope fa-lg fa-fw"/></span>
                                                                                             <input className="form-control" type="text" name="email"
                                                                                                                             ref="email" placeholder="Email"
-                                                                                                                            value={this.state.email} onChange={this.onInputChange}/>
+                                                                                                                            value={this.state.profile.email} onChange={this.onInputChange}/>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
@@ -346,13 +338,13 @@ class CreateProfile extends React.Component {
                                                                                         <div className="input-group">
                                                                                             <span className="input-group-addon"><i className="fa fa-phone fa-lg fa-fw"/></span>
                                                                                             <input className="form-control" name="phone"
-                                                                                                                            ref="phone" placeholder="Phone" onChange={this.onInputChange}/>
+                                                                                                                            ref="phone" value={this.state.profile.phone} placeholder="Phone" onChange={this.onInputChange}/>
                                                                                         </div>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="col-sm-4">
                                                                                     <select className="form-control" name="phone_type"
-                                                                                                                            ref="phone_type" defaultValue="" onChange={this.onInputChange}>
+                                                                                                                            ref="phone_type" defaultValue={this.state.profile.phone_type} onChange={this.onInputChange}>
                                                                                         <option value="" disabled>Phone Type</option>
                                                                                         {phoneTypes.map(function(type) {
                                                                                                 return(
@@ -369,7 +361,7 @@ class CreateProfile extends React.Component {
                                                                                     <div className="form-group">
                                                                                         <div className="input-group">
                                                                                             <span className="input-group-addon"><i className="fa fa-location-arrow fa-lg fa-fw"/></span>
-                                                                                            <input className="form-control" type="text" name="street1"
+                                                                                            <input className="form-control" type="text" name="street1" value={this.state.profile.street1}
                                                                                                                             ref="street1" placeholder="Street 1"
                                                                                                                             onChange={this.onInputChange}/>
                                                                                         </div>
@@ -379,7 +371,7 @@ class CreateProfile extends React.Component {
                                                                                     <div className="form-group">
                                                                                         <div className="input-group">
                                                                                             <span className="input-group-addon"><i className="fa fa-location-arrow fa-lg fa-fw"/></span>
-                                                                                            <input className="form-control" type="text" name="street2"
+                                                                                            <input className="form-control" type="text" name="street2" value={this.state.profile.street2}
                                                                                                                             ref="street2" placeholder="Street 2"
                                                                                                                             onChange={this.onInputChange}/>
                                                                                         </div>
@@ -389,21 +381,21 @@ class CreateProfile extends React.Component {
                                                                             <div className="row">
                                                                                 <div className="col-sm-6">
                                                                                     <div className="form-group">
-                                                                                        <input className="form-control" type="text" name="city"
+                                                                                        <input className="form-control" type="text" name="city" value={this.state.profile.city}
                                                                                                                         ref="city" placeholder="City"
                                                                                                                         onChange={this.onInputChange}/>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="col-sm-2">
                                                                                     <div className="form-group">
-                                                                                        <input className="form-control" type="text" name="state"
+                                                                                        <input className="form-control" type="text" name="state" value={this.state.profile.state}
                                                                                                                         ref="state" placeholder="State"
                                                                                                                         onChange={this.onInputChange}/>
                                                                                     </div>
                                                                                 </div>
                                                                                 <div className="col-sm-4">
                                                                                     <div className="form-group">
-                                                                                        <input className="form-control" type="text" name="zip"
+                                                                                        <input className="form-control" type="text" name="zip" value={this.state.profile.zip}
                                                                                                                         ref="zip" placeholder="Zip"
                                                                                                                         onChange={this.onInputChange}/>
                                                                                     </div>
@@ -412,7 +404,7 @@ class CreateProfile extends React.Component {
                                                                             <div className="row">
                                                                                 <div className="col-sm-8">
                                                                                     <div className="form-group">
-                                                                                        <select name="country" className="form-control" ref="country" defaultValue="" onChange={this.onInputChange}>
+                                                                                        <select name="country" className="form-control" ref="country" defaultValue={this.state.profile.country} onChange={this.onInputChange}>
                                                                                             <option value="" disabled>Country</option>
                                                                                                 {countries.map((country)=>{
                                                                                                     return <option key={country.key} value={country.value}>{country.value}</option>
@@ -423,7 +415,7 @@ class CreateProfile extends React.Component {
                                                                                 </div>
                                                                                 <div className="col-sm-4">
                                                                                     <div className="form-group">
-                                                                                        <select className="form-control" name="address_type" ref="address_type" defaultValue="" onChange={this.onInputChange}>
+                                                                                        <select className="form-control" name="address_type" ref="address_type" defaultValue={this.state.profile.address_type} onChange={this.onInputChange}>
                                                                                             <option value="" disabled>Address Type</option>
                                                                                             {addressTypes.map(function(type) {
                                                                                                     return(
@@ -444,7 +436,7 @@ class CreateProfile extends React.Component {
                                                                                     <div>
                                                                                         <img ref="image" className="img-thumbnail"
                                                                                                             style={{objectFit: 'cover', height: "120px", width: "120px"}}
-                                                                                                            src="assets/img/avatars/user.png"/><br/>
+                                                                                                            src={this.state.profile.photoURL}/><br/>
                                                                                     </div>
                                                                                     <label className="btn btn-link">Select Photo
                                                                                         <input ref="imageSelect" type="file" style={{display: 'none'}} onChange={this.photoHandler}/>
@@ -464,24 +456,24 @@ class CreateProfile extends React.Component {
                                                                                         <tbody>
                                                                                             <tr>
                                                                                                 <td><p className="text-muted"><strong><i className="fa fa-user"/>&nbsp;&nbsp;Name:</strong></p></td>
-                                                                                                <td><p className="text-muted">{this.state.firstname + " " + this.state.lastname}</p></td>
+                                                                                                <td><p className="text-muted">{this.state.profile.firstname + " " + this.state.profile.lastname}</p></td>
                                                                                             </tr>
                                                                                             <tr>
                                                                                                 <td><p className="text-muted"><strong><i className="fa fa-envelope"/>&nbsp;&nbsp;Email:</strong></p></td>
-                                                                                                <td><p className="text-muted">{this.state.email}</p></td>
+                                                                                                <td><p className="text-muted">{this.state.profile.email}</p></td>
                                                                                             </tr>
                                                                                             <tr>
                                                                                                 <td><p className="text-muted"><strong><i className="fa fa-phone"/>&nbsp;&nbsp;Phone:</strong></p></td>
-                                                                                                <td><p className="text-muted">{this.state.phone}
-                                                                                                    <small className="pull-right text-primary">{this.state.phonetype}</small></p></td>
+                                                                                                <td><p className="text-muted">{this.state.profile.phone}
+                                                                                                    <small className="pull-right text-primary">{this.state.profile.phone_type}</small></p></td>
                                                                                             </tr>
                                                                                             <tr>
                                                                                                 <td><p className="text-muted"><strong><i className="fa fa-map-marker"/>&nbsp;&nbsp;Address:</strong></p></td>
                                                                                                 <td>
-                                                                                                    <p className="text-muted">{this.state.street1 + " " + this.state.street2}
-                                                                                                    <small className="pull-right text-primary">{this.state.addresstype}</small><br/>
-                                                                                                        {this.state.city + ", " + this.state.state + " " + this.state.zip}<br/>
-                                                                                                        {this.state.country}
+                                                                                                    <p className="text-muted">{this.state.profile.street1 + " " + this.state.profile.street2}
+                                                                                                    <small className="pull-right text-primary">{this.state.profile.address_type}</small><br/>
+                                                                                                        {this.state.profile.city + ", " + this.state.profile.state + " " + this.state.profile.zip}<br/>
+                                                                                                        {this.state.profile.country}
                                                                                                     </p>
                                                                                                 </td>
                                                                                             </tr>
@@ -493,9 +485,9 @@ class CreateProfile extends React.Component {
                                                                         <div className="tab-pane" data-smart-wizard-pane="4"><br/>
                                                                             <h3><strong>Step 4 </strong> - Complete</h3><hr/>
                                                                             <div className="row"><br/>
-                                                                                <h1 className="text-center">Thanks, {this.state.firstname}!</h1>
+                                                                                <h1 className="text-center">Thanks, {this.state.profile.firstname}!</h1>
                                                                                 <div className="text-center">
-                                                                                    <div><img style={{objectFit: 'cover', height: "100px", width: "100px"}} src="assets/img/avatars/user.png"/></div>
+                                                                                    <div><img style={{objectFit: 'cover', height: "100px", width: "100px"}} src={this.state.profile.photoURL}/></div>
                                                                                 </div><br/><br/>
                                                                             </div>
                                                                             <div className="row">

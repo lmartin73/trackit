@@ -19,10 +19,9 @@ const mapDispatchToProps = (dispatch) => {
     */
     return {
         goBackToLogin: () => {
-            message_title = 'Email delivered'
-            message_description = 'Password recovery email has been sent!'
-            type = 'success'
-
+            var message_title = 'Email Sent'
+            var message_description = 'Password recovery email has been sent!'
+            var type = 'success'
             dispatch(push('/login'))
             smallAlertMessage(message_title, message_description, type)
         }

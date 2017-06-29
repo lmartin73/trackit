@@ -16,6 +16,13 @@ export default function userReducer (state = {
             isLogging: true
         }
 
+    case UserConstants.ATTEMPT_REGISTER_USER:
+        return {
+            AUTH_STATE: UserConstants.AWAITING_AUTHENTICATION,
+            CURRENT_USER: null,
+            isLogging: true
+        }
+
     case UserConstants.LOGOUT_USER:
         return{
             AUTH_STATE: UserConstants.GUEST,

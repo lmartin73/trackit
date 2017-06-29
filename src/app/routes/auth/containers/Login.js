@@ -6,8 +6,10 @@ import { AUTHENTICATED, GUEST, AWAITING_AUTHENTICATION } from '../../../componen
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
-import { smallAlertMessage } from "../../../components/alert-messaging/AlertMessaging";
+import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
+import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 
+// Hash module
 var sha256 = require('js-sha256');
 
 const mapStateToProps = (state) => {
@@ -34,12 +36,15 @@ const mapDispatchToProps = (dispatch) => {
         },
         loginSuccess: () => {
             // Method to route to dashboard and show successful login message
-            message_title = 'Login Successful!'
-            message_description = 'Welcome back to TrackIt!'
-            type = 'success'
+            var message_title = 'Login Successful!'
+            var message_description = 'Welcome back to TrackIt!'
+            var type = 'success'
 
             dispatch(push('/dashboard'))
             smallAlertMessage(message_title, message_description, type)
+        },
+        dispatchRoute: (route) => {
+            dispatch(push(route))
         }
     }
 }
@@ -50,15 +55,10 @@ class Login extends React.Component {
     componentWillReceiveProps(props) {
         /*
             Used as a handler for authentication state changes
-
             - If state changed to authenticated, user is logged in
-            - If state is not changed to authenticated, do nothing
         */
         if (props.authState === AUTHENTICATED && !props.isLogging) {
             this.props.loginSuccess()
-
-        } else if (props.authState === GUEST) {
-            // Todo: Error message
         }
     }
 
@@ -126,14 +126,7 @@ class Login extends React.Component {
 
     render() {
         if (this.props.isLogging) {
-            return (
-                <div>
-                    <div style={{marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-                        <img style={{width: '30px', height: '30px'}} src="assets/img/spinner/ripple.gif" />
-                    </div><br/>
-                    <p className="text-center text-muted">Loading account...</p>
-                </div>
-            )
+            return <LoadingSpinner text='Loading account...' />
         }
 
         return (
@@ -146,7 +139,7 @@ class Login extends React.Component {
                     </div>
                     <span id="extr-page-header-space">
                         <span className="hidden-mobile hiddex-xs">Need an account?</span>&nbsp;
-                        <a href="#/register" className="btn btn-danger">Create account</a>
+                        <a onClick={() => {this.props.dispatchRoute('/register')}} className="btn btn-danger">Create account</a>
                     </span>
                 </header>
                 <div id="main" role="main" className="animated fadeInDown">
@@ -173,7 +166,7 @@ class Login extends React.Component {
                                                     <b className="tooltip tooltip-top-right"><i className="fa fa-lock txt-color-teal"/>
                                                         Please enter your password.</b></label>
                                                     <div className="note">
-                                                        <a href="#/forgot">Forgot password?</a>
+                                                        <a onClick={() => {this.props.dispatchRoute('/forgot')}}>Forgot password?</a>
                                                     </div>
                                                 </section>
                                                 <section>

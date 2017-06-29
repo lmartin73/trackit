@@ -1,7 +1,7 @@
 import * as firebase from 'firebase'
 import * as UserConstants from './UserConstants'
 import * as ProfileConstants from '../../routes/profile/containers/ProfileConstants'
-import {loadUserProfile, storeUserProfile} from '../../routes/profile/containers/ProfileActions'
+import {loadUserProfile, storeUserProfile, createProfileWithEmailAction} from '../../routes/profile/containers/ProfileActions'
 import { push } from 'react-router-redux'
 
 export const REQUEST_USER = 'REQUEST_USER'
@@ -61,6 +61,26 @@ export function attemptLoginWithEmail(email,password){
         firebase.auth().signInWithEmailAndPassword(email,password).catch(function(error){
             //TODO HANDLE LOGIN ERRORS
         });
+    }
+}
+
+export function attemptRegisterWithEmail(email, password, firstname, lastname) {
+    return function(dispatch, getState) {
+        dispatch({
+            type: UserConstants.ATTEMPT_REGISTER_USER
+        })
+
+        firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+            // Todo: Handle errors
+            console.log(error)
+        }).then(function(user) {
+            dispatch(createProfileWithEmailAction({
+                firstname: firstname,
+                lastname: lastname,
+                email: email,
+                uid: user.uid
+            }))
+        })
     }
 }
 

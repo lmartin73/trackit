@@ -1,17 +1,75 @@
 import React from 'react'
-import ReactDOM from 'react-dom';
+import { connect } from 'react-redux'
+import { push } from 'react-router-redux'
 import HtmlRender from '../../../components/utils/HtmlRender'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
+import { AUTHENTICATED } from '../../../components/user/UserConstants'
+import { attemptRegisterWithEmail } from '../../../components/user/UserActions'
+import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
+import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
+
 
 // Terms and agreement information
 const terms = require('html-loader!../components/TermsAndConditions.html');
 
-export default class Register extends React.Component {
+// Hash module
+var sha256 = require('js-sha256');
+
+const mapStateToProps = (state) => {
+    /*
+        Maps redux states to local props
+        - authState: authentication state of the user
+        - auth_logging: boolean for whether authentication is logging or not
+        - profile_loading: boolean for whether profile is loading or not
+    */
+    return {
+        authState: state.user.AUTH_STATE,
+        auth_logging: state.user.isLogging,
+        profile_loading: state.profile.isLoading
+    }
+}
+
+const mapDispatchToProps = (dispatch) => {
+    /*
+        Maps the redux dispatch calls to local props
+        - attemptRegister: method to attempt to register new user
+        - registerSuccess: navigates to create profile route
+    */
+    return {
+        attemptRegister: (email, password, firstname, lastname) => {
+            dispatch(attemptRegisterWithEmail(email, password, firstname, lastname))
+        },
+        registerSuccess: () => {
+            // Method to route to dashboard and show successful login message
+            var message_title = 'Success!'
+            var message_description = 'Welcome To TrackIt!'
+            var type = 'success'
+            dispatch(push('/createprofile'))
+            smallAlertMessage(message_title, message_description, type)
+        }
+    }
+}
+
+class Register extends React.Component {
+    /* Register component for user authentication */
 
     constructor() {
         super();
+        // Bind methods to this pointer
+        this.onInputValueChanged = this.onInputValueChanged.bind(this);
+
+        // Initialize local state
+        this.state = {
+            newUserInfo: {
+                firstname: '',
+                lastname: '',
+                email: '',
+                password: sha256('')
+            }
+        }
+
         // form validation options
         this.validationOptions = {
             rules: {
@@ -55,9 +113,42 @@ export default class Register extends React.Component {
                 }
             },
             submitHandler: function(form) {
-                // Todo: Register user here
+                // attempt to register user
+                this.props.attemptRegister(this.state.newUserInfo.email, this.state.newUserInfo.password,
+                                            this.state.newUserInfo.firstname, this.state.newUserInfo.lastname)
             }.bind(this)
         };
+    }
+
+    componentWillReceiveProps(new_props) {
+        /*
+            Used as a handler for authentication state changes
+            - If state changed to authenticated and profile stops loading
+                , user is registed and logged in
+                - proceed to create profile route
+        */
+        if (new_props.authState === AUTHENTICATED && !new_props.profile_loading) {
+            this.props.registerSuccess()
+        }
+    }
+
+    onInputValueChanged(event) {
+        /*
+            Method used to update state in correspondence with input fields when modified
+            - Update firstname, lastname, and email field in state when input is changed
+            - Update password hash in state when password input is changed
+        */
+        event.preventDefault();
+        var newUserInfo_key = 'newUserInfo'
+        var new_state = {newUserInfo: {...this.state.newUserInfo}};
+
+        if (event.target.name === 'password') {
+            // Hash new password
+            new_state[newUserInfo_key][event.target.name] = sha256(event.target.value);
+        } else {
+            new_state[newUserInfo_key][event.target.name] = event.target.value;
+        }
+        this.setState(new_state);
     }
 
     displayTerms() {
@@ -84,6 +175,13 @@ export default class Register extends React.Component {
     }
 
     render() {
+        // Show loading spinner with specific text depending on auth/profile state
+        if (this.props.auth_logging) {
+            return <LoadingSpinner text='Registering your account...' />
+        } else if (this.props.profile_loading) {
+            return <LoadingSpinner text='Initializing profile...' />
+        }
+
         return (
             <div id="extr-page">
                 <header id="header" className="animated fadeInDown">
@@ -108,27 +206,27 @@ export default class Register extends React.Component {
                                             <fieldset>
                                                 <section>
                                                     <label className="input"> <i className="icon-append fa fa-user"/>
-                                                    <input type="text" name="firstname" ref="firstname" placeholder="First Name" />
+                                                    <input type="text" id="firstname" name="firstname" placeholder="First Name" onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your first name.</b> </label>
                                                 </section>
                                                 <section>
                                                     <label className="input"> <i className="icon-append fa fa-user"/>
-                                                    <input type="text" name="lastname" ref="lastname" placeholder="Last Name" />
+                                                    <input type="text" id="lastname" name="lastname" placeholder="Last Name" onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your last name.</b> </label>
                                                 </section>
                                                 <section>
                                                     <label className="input"> <i className="icon-append fa fa-envelope"/>
-                                                    <input type="email" name="email" ref="email" placeholder="Email" />
+                                                    <input type="email" id="email" name="email" placeholder="Email" onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your email address.</b> </label>
                                                 </section>
                                                 <section>
                                                     <label className="input"> <i className="icon-append fa fa-lock"/>
-                                                    <input type="password" name="password" ref="password" placeholder="Password" />
+                                                    <input type="password" id="password" name="password" placeholder="Password" onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your password.</b> </label>
                                                 </section>
                                                 <section>
                                                     <label className="input"> <i className="icon-append fa fa-lock"/>
-                                                    <input type="password" name="passwordConfirm" ref="passwordConfirm" placeholder="Confirm password" />
+                                                    <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" />
                                                     <b className="tooltip tooltip-bottom-right">Please confirm your password.</b> </label>
                                                 </section>
                                             </fieldset>
@@ -156,3 +254,6 @@ export default class Register extends React.Component {
         )
     }
 }
+
+// Use connect method to connect redux store to component
+export default connect(mapStateToProps, mapDispatchToProps)(Register)

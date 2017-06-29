@@ -1,4 +1,4 @@
-import { smallBox } from "../components/utils/actions/MessageActions";
+import { smallBox } from "../utils/actions/MessageActions";
 
 const TIMEOUT = 4000
 
