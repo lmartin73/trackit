@@ -94,7 +94,7 @@ export default class Organization {
 
         this.orgDataPath = null;
         this.orgStoragePath = null;
-        if(orgID){
+        if(orgID != ""){
             this.orgDataPath = `${ORGANIZATION_DATAPATH}/${orgID}`
             this.orgStoragePath = `${ORGANIZATION_DATAPATH}/${orgID}`
         }

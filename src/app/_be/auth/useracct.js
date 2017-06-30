@@ -207,7 +207,8 @@ export class UserProfile {
             zip: this.zip,
             country: this.country,
             address_type: this.address_type,
-            photoURL: this.photoDownloadURL
+            photoURL: this.photoDownloadURL,
+            organizations: this.organizationRoles
 
         };
 
