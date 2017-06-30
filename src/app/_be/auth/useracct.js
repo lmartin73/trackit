@@ -27,6 +27,8 @@ import * as firebase from 'firebase'
         isAdministator: boolean
         isOwner: boolean
         isPending: boolean
+        name: String
+        logoURL: String
     }
 */
 export class UserProfile {
@@ -51,6 +53,7 @@ export class UserProfile {
         this.profileDataPath = `users/${this.uid}`;
         this.profileStoragePath = `users/${this.uid}/`
         this.orgDataPath =`organizations`;
+        this.organizationRoles = {};
         if(uid != ""){
             this.downloadProfile();
         }
@@ -146,7 +149,7 @@ export class UserProfile {
     //this returns a firebase database reference to the user's roles within a given organization
     getOrgRef(orgUID=null){
         //make sure the user's uid is initialize first
-        if((this.uid != "") && orgUID){
+        if((this.uid != "") && (orgUID != null)){
             return firebase.database().ref(`${this.profileDataPath}/${this.orgDataPath}/${orgUID}`)
         }
     }
@@ -166,9 +169,8 @@ export class UserProfile {
             this.country = snapshot.val().country;
             this.address_type = snapshot.val().address_type;
             this.photoDownloadURL = snapshot.val().photoURL;
+            this.organizations = snapshot.val().organizations;
             this.hasLoaded = true;
-
-
 
 
         }.bind(this));
@@ -235,6 +237,31 @@ export class UserProfile {
         };
 
         return phone;
+    }
+
+    getOrganizations(){
+        var memberOrgs = [];
+        for (orgUID in this.organizations){
+            if (this.organizations.hasOwnProperty(orgUID)){
+                if(this.organizations[orgUID].isMember == true){
+                    memberOrgs.push(this.organizations[orgUID]);
+                }
+            }
+        }
+        return memberOrgs;
+    }
+
+    getPendingOrganizations(){
+
+        var pendingOrgs = [];
+        for (orgUID in this.organizations){
+            if (this.organizations.hasOwnProperty(orgUID)){
+                if(this.organizations[orgUID].isPending == true){
+                    pendingOrgs.push(this.organizations[orgUID]);
+                }
+            }
+        }
+        return pendingOrgs;
     }
 
     getAddress(){

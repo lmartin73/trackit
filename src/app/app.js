@@ -5,8 +5,7 @@ import {syncHistoryWithStore, routerActions} from 'react-router-redux'
 import {Router, hashHistory} from 'react-router'
 import * as firebase from 'firebase'
 import {FIRconfig} from './config/firebaseConfig' // import firebase config details
-
-import {logoutUser, startListeningToAuth} from './components/user'
+import {logoutUser, startListeningToAuth, } from './components/user'
 
 import store from './store/configureStore'
 
