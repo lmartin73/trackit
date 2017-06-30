@@ -54,7 +54,7 @@ class ProfileContainer extends React.Component {
     render() {
         // Show loading spinner with specified text if profile loading
         if (this.props.profile_loading) {
-            return <LoadingSpinner text='Loading profile...'>
+            return <LoadingSpinner text='Loading profile...' />
         }
 
         return(

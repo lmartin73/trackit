@@ -215,7 +215,7 @@ class EditProfile extends React.Component {
     render() {
         // Show loading spinner with specified text if profile is loading/updating
         if (this.props.profile_loading) {
-            return <LoadingSpinner text='Saving profile...'>
+            return <LoadingSpinner text='Saving profile...' />
         }
 
         return(
