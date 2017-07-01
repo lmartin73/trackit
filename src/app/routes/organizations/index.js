@@ -16,14 +16,14 @@ export default {
                 })
             }
         },
-//        {
-//            path: 'detailorg',
-//            getComponent(nextState, cb){
-//                System.import('./containers/DetailOrgContainer.js').then((m)=> {
-//                    cb(null, m.default)
-//                })
-//            }
-//        },
+        {
+            path: 'detailorg',
+            getComponent(nextState, cb){
+                System.import('./containers/DetailOrgContainer.js').then((m)=> {
+                    cb(null, m.default)
+                })
+            }
+        },
 //        {
 //            path: 'editorg',
 //            getComponent(nextState, cb){

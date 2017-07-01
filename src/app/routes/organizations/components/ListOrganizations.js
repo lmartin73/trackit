@@ -6,6 +6,8 @@ import JarvisWidget from '../../../components/widgets/JarvisWidget'
     Dumb component for listing organizations current user is associated with
 */
 export const ListOrganizations = (props) => {
+
+
     return(
         <div id="content" className="animated fadeInDown">
             <div className="row">
@@ -31,13 +33,13 @@ export const ListOrganizations = (props) => {
                                                         <p className="text-center text-default">No Active Organizations</p>
                                                     </div>
                                                 ) : (
-                                                    props.enrolledOrgs.map(function(org) {
+                                                    props.enrolledOrgs.map(function(orgUID) {
                                                         return(
-                                                            <div key={org.id} className="col-lg-6 col-md-6 col-sm-6">
+                                                            <div key={orgUID} className="col-lg-6 col-md-6 col-sm-6">
                                                                 <div className="panel panel-default">
                                                                     <div className="form-inline">
-                                                                        <img src={org.logoURL} style={{objectFit: 'cover', height: "60px", width: "60px"}}/>
-                                                                        <button className="btn btn-link" onClick={() => props.orgClicked(org.id)}>{org.name}</button>
+                                                                        <img src={props.enrolledOrgs[orgUID].logoURL} style={{objectFit: 'cover', height: "60px", width: "60px"}} />
+                                                                        <button className="btn btn-link" disabled>{props.enrolledOrgs[orgUID].name}</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -55,13 +57,13 @@ export const ListOrganizations = (props) => {
                                                         <p className="text-center text-default">No Pending Organizations</p>
                                                     </div>
                                                 ) : (
-                                                    props.pendingOrgs.map(function(org) {
+                                                    props.pendingOrgs.map(function(orgUID) {
                                                         return(
-                                                            <div key={org.id} className="col-lg-6 col-md-6 col-sm-6">
+                                                            <div key={orgUID} className="col-lg-6 col-md-6 col-sm-6">
                                                                 <div className="panel panel-default">
                                                                     <div className="form-inline">
-                                                                        <img src={org.logoURL} style={{objectFit: 'cover', height: "60px", width: "60px"}}/>
-                                                                        <button className="btn btn-link" disabled>{org.name}</button>
+                                                                        <img src={props.pendingOrgs[orgUID].logoURL} style={{objectFit: 'cover', height: "60px", width: "60px"}} />
+                                                                        <button className="btn btn-link" disabled>{props.pendingOrgs[orgUID].name}</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
