@@ -18,6 +18,8 @@ import * as firebase from 'firebase'
         zip: ...,
         address_type: ...,
         photoURL: ...,
+        enrolledOrgs: [],
+        pendingOrgs: []
     }
 
 
@@ -208,8 +210,8 @@ export class UserProfile {
             country: this.country,
             address_type: this.address_type,
             photoURL: this.photoDownloadURL,
-            organizations: this.organizationRoles
-
+            enrolledOrgs: this.getOrganizations(),
+            pendingOrgs: this.getPendingOrganizations()
         };
 
         return profileData;
