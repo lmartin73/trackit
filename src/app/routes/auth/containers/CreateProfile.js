@@ -262,7 +262,7 @@ class CreateProfile extends React.Component {
                             Welcome to <strong>Trackit+</strong><hr/>
                         </div>
                         <div className="row">
-                            <WelcomeContent email={this.state.email}/>
+                            <WelcomeContent email={this.state.profile.email}/>
                             <div className="col-sm-12 col-xs-12 col-md-7 col-lg-6">
                                 <WidgetGrid>
                                     <article>
