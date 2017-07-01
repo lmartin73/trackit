@@ -17,8 +17,13 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
     // Maps the redux dispatch calls to local props
     return {
-        dispatch_route: (route) => {
-            dispatch(push(route))
+        goToDetails: (orgUID) => {
+            dispatch(push({
+                pathname: '/organization/detailorg',
+                query: {
+                    orgUID: orgUID
+                }
+            }))
         }
     }
 }
@@ -32,10 +37,11 @@ class ListOrgsContainer extends React.Component {
         this.orgClicked = this.onOrganizationClicked.bind(this);
     }
 
-    onOrganizationClicked(id) {
+    onOrganizationClicked(orgUID) {
         /*
             Directs user to organization that was clicked
         */
+        this.props.goToDetails(orgUID)
     }
 
     render() {
