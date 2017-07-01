@@ -43,6 +43,17 @@
       ]
     },
     {
+      "title": "Organizations",
+      "icon": "fa fa-lg fa-fw fa-users",
+      "items": [
+        {
+          "title": "My Organizations",
+          "route": "/organizations/listorgs",
+          "icon": "fa fa-bars"
+        }
+      ]
+    },
+    {
       "title": "Outlook",
       "route": "/outlook",
       "icon": "fa fa-lg fa-fw fa-inbox",
