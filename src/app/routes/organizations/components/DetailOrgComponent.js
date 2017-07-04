@@ -4,6 +4,7 @@ import JarvisWidget from '../../../components/widgets/JarvisWidget'
 
 /*
     Dumb component for displaying details of a specific organization
+    - Todo: change keys for mapping of lists for user profiles
 */
 export const DetailOrgComponent = (props) => {
     return(
@@ -35,6 +36,11 @@ export const DetailOrgComponent = (props) => {
                             <p className="text-muted">
                                 <i className="fa fa-phone" />&nbsp;&nbsp;<span className="txt-color-darken">{props.org.phone}</span>
                             </p>
+                        </div>
+                        <div className="col-lg-2 col-md-2 col-sm-2 col-xs-2"></div>
+                        <div className="row text-center col-lg-10 col-lg-offset-1 col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1 col-xs-10 col-xs-offset-1">
+                            <hr/>
+                            <p>{props.org.description}</p>
                         </div>
                     </div>
                 </JarvisWidget>
@@ -81,7 +87,7 @@ export const DetailOrgComponent = (props) => {
                                             ) : (
                                                 props.administrators.map(function(mem) {
                                                     return(
-                                                        <div key={mem.uid} className="col-lg-6 col-md-6 col-sm-6">
+                                                        <div key={mem.firstname} className="col-lg-6 col-md-6 col-sm-6">
                                                             <div className="panel panel-default">
                                                                 <div className="form-inline">
                                                                     &nbsp;&nbsp;<img src={mem.photoURL} style={{objectFit: 'cover', height: "50px", width: "50px"}}/>
@@ -106,11 +112,11 @@ export const DetailOrgComponent = (props) => {
                                             ) : (
                                                 props.members.map(function(mem) {
                                                     return(
-                                                        <div key={mem.uid} className="col-lg-6 col-md-6 col-sm-6">
+                                                        <div key={mem.firstname} className="col-lg-6 col-md-6 col-sm-6">
                                                             <div className="panel panel-default">
                                                                 <div className="form-inline">
                                                                     &nbsp;&nbsp;<img src={mem.photoURL} style={{objectFit: 'cover', height: "50px", width: "50px"}}/>
-                                                                    <button className="btn btn-link">{mem.name}</button>
+                                                                    <button className="btn btn-link">{mem.firstname + " " + mem.lastname}</button>
                                                                 </div>
                                                             </div>
                                                         </div>

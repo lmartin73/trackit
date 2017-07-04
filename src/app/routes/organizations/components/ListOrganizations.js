@@ -33,13 +33,13 @@ export const ListOrganizations = (props) => {
                                                         <p className="text-center text-default">No Active Organizations</p>
                                                     </div>
                                                 ) : (
-                                                    props.enrolledOrgs.map(function(orgUID) {
+                                                    Object.keys(props.enrolledOrgs).map(function(orgUID) {
                                                         return(
                                                             <div key={orgUID} className="col-lg-6 col-md-6 col-sm-6">
                                                                 <div className="panel panel-default">
                                                                     <div className="form-inline">
                                                                         <img src={props.enrolledOrgs[orgUID].logoURL} style={{objectFit: 'cover', height: "60px", width: "60px"}} />
-                                                                        <button className="btn btn-link" disabled>{props.enrolledOrgs[orgUID].name}</button>
+                                                                        <button className="btn btn-link" onClick={() => props.orgClicked(orgUID)}>{props.enrolledOrgs[orgUID].name}</button>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -57,7 +57,7 @@ export const ListOrganizations = (props) => {
                                                         <p className="text-center text-default">No Pending Organizations</p>
                                                     </div>
                                                 ) : (
-                                                    props.pendingOrgs.map(function(orgUID) {
+                                                    Object.keys(props.pendingOrgs).map(function(orgUID) {
                                                         return(
                                                             <div key={orgUID} className="col-lg-6 col-md-6 col-sm-6">
                                                                 <div className="panel panel-default">

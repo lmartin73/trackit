@@ -19,7 +19,7 @@ const mapDispatchToProps = (dispatch) => {
     return {
         goToDetails: (orgUID) => {
             dispatch(push({
-                pathname: '/organization/detailorg',
+                pathname: 'organizations/detailorg',
                 query: {
                     orgUID: orgUID
                 }
@@ -38,9 +38,7 @@ class ListOrgsContainer extends React.Component {
     }
 
     onOrganizationClicked(orgUID) {
-        /*
-            Directs user to organization that was clicked
-        */
+        // Directs user to organization that was clicked
         this.props.goToDetails(orgUID)
     }
 
