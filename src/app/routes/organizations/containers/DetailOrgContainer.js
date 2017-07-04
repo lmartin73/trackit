@@ -21,14 +21,21 @@ const mapDispatchToProps = (dispatch) => {
     return {
         dispatch_route: (route) => {
             dispatch(push(route))
+        },
+        goToEdit: (orgUID) => {
+            dispatch(push({
+                pathname: 'organizations/editorg',
+                query: {
+                    orgUID: orgUID
+                }
+            }))
         }
     }
 }
 
 class DetailOrgContainer extends React.Component {
-    /*
-        Component to display details about selected organization
-    */
+    // Component to display details about selected organization
+
     constructor(props) {
         super(props);
         // Bind methods to this pointer
@@ -58,25 +65,17 @@ class DetailOrgContainer extends React.Component {
             this.administrators.push(profile);
         }
 
+        // Update state to render detail component
         this.setState({orgLoaded: true})
     }
 
     onEditClicked() {
-        /*
-            Direct user to edit organization route
-
-            - pass org id as prop
-        */
-//        store.dispatch(push({
-//            pathname: 'organizations/editorg',
-//            state: {orgID: this.state.org.id}
-//        }));
+        // Edit organization action
+        this.props.goToEdit(this.props.orgUID);
     }
 
     onLeaveClicked() {
-        /*
-            remove organization action
-        */
+        // remove organization action
         SmartMessageBox({
             title: "Sure?",
             content: "Are you sure you want to leave this organization?",
