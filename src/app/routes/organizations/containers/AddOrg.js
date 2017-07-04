@@ -279,7 +279,7 @@ export default class AddOrg extends React.Component {
 
     render() {
         return(
-            <div id="content" className="container-fluid">
+            <div id="content" className="container-fluid animated fadeInDown">
                 <div className="row">
                     <BigBreadcrumbs items={['Organizations', 'New Organization']} icon="fa fa-fw fa-users"
                                     className="col-xs-12 col-sm-7 col-md-7 col-lg-4"/>

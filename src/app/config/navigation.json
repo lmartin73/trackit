@@ -50,6 +50,16 @@
           "title": "My Organizations",
           "route": "/organizations/listorgs",
           "icon": "fa fa-bars"
+        },
+        {
+          "title": "Create New",
+          "route": "/organizations/addorg",
+          "icon": "fa fa-plus"
+        },
+        {
+          "title": "Join Organization",
+          "route": "/organizations/joinorg",
+          "icon": "fa fa-sitemap"
         }
       ]
     },
