@@ -6,16 +6,14 @@ import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 import * as firebase from 'firebase'
 import { smallAlertMessage } from "../../../components/alert-messaging/AlertMessaging";
+import { textfieldStyle } from '../../../components/styles/styles'
 
-
-const mapStateToProps = (state) => {
-    return {}
-}
 
 const mapDispatchToProps = (dispatch) => {
     /*
         Maps the redux dispatch calls to local props
         - goBackToLogin: redirects to Login page
+        - dispatch_route: pushes route to DOM
     */
     return {
         goBackToLogin: () => {
@@ -24,6 +22,9 @@ const mapDispatchToProps = (dispatch) => {
             var type = 'success'
             dispatch(push('/login'))
             smallAlertMessage(message_title, message_description, type)
+        },
+        dispatch_route: (route) => {
+            dispatch(push(route))
         }
     }
 }
@@ -84,15 +85,14 @@ class Forgot extends React.Component {
                                             <header>Forgot Password</header>
                                             <fieldset>
                                                 <section>
-                                                    <label className="label">Enter your email address.</label>
-                                                    <label className="input"> <i className="icon-append fa fa-envelope"/>
-                                                    <input type="email" name="email" ref="email"/>
+                                                    <label className="input">
+                                                    <input type="email" name="email" ref="email" placeholder="Email" style={textfieldStyle}/>
                                                     <b className="tooltip tooltip-top-right"><i className="fa fa-envelope txt-color-teal"/>
                                                         &nbsp;Need to recover your account? Please enter your email address.</b></label>
                                                 </section>
                                                 <section>
                                                     <div className="note">
-                                                        <a href="#/login">I remembered my password!</a>
+                                                        <a onClick={() => {this.props.dispatch_route('/login')}}>I remembered my password!</a>
                                                     </div>
                                                 </section>
                                             </fieldset>
@@ -115,4 +115,4 @@ class Forgot extends React.Component {
 }
 
 // Use connect method to connect redux store to Login component
-export default connect(mapStateToProps, mapDispatchToProps)(Forgot)
+export default connect(null, mapDispatchToProps)(Forgot)

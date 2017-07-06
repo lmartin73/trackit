@@ -8,9 +8,12 @@ import DisplayContent from '../components/DisplayContent'
 import Footer from '../components/Footer'
 import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
 import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
+import { textfieldStyle } from '../../../components/styles/styles'
 
 // Hash module
 var sha256 = require('js-sha256');
+
+
 
 const mapStateToProps = (state) => {
     /*
@@ -153,18 +156,17 @@ class Login extends React.Component {
                                             <header>Sign In</header>
                                             <fieldset>
                                                 <section>
-                                                    <label className="label">E-mail</label>
-                                                    <label className="input"> <i className="icon-append fa fa-user"/>
-                                                    <input type="email" name="email" onChange={this.onInputValueChanged} />
+                                                    <label className="input">
+                                                    <input type="email" name="email" placeholder="Email" style={textfieldStyle} onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-top-right"><i className="fa fa-user txt-color-teal"/>
                                                         Please enter your email address.</b></label>
                                                 </section>
                                                 <section>
-                                                    <label className="label">Password</label>
-                                                    <label className="input"> <i className="icon-append fa fa-lock"/>
-                                                    <input type="password" name="password" onChange={this.onInputValueChanged} />
+                                                    <label className="input">
+                                                    <input type="password" name="password" placeholder="Password" style={textfieldStyle} onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-top-right"><i className="fa fa-lock txt-color-teal"/>
                                                         Please enter your password.</b></label>
+                                                    <br/>
                                                     <div className="note">
                                                         <a onClick={() => {this.props.dispatchRoute('/forgot')}}>Forgot password?</a>
                                                     </div>

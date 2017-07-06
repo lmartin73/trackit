@@ -9,6 +9,7 @@ import { AUTHENTICATED } from '../../../components/user/UserConstants'
 import { attemptRegisterWithEmail } from '../../../components/user/UserActions'
 import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
+import { textfieldStyle } from '../../../components/styles/styles'
 
 
 // Terms and agreement information
@@ -205,28 +206,28 @@ class Register extends React.Component {
                                         <form id="smart-form-register" className="smart-form client-form">
                                             <fieldset>
                                                 <section>
-                                                    <label className="input"> <i className="icon-append fa fa-user"/>
-                                                    <input type="text" id="firstname" name="firstname" placeholder="First Name" onChange={this.onInputValueChanged} />
+                                                    <label className="input">
+                                                    <input type="text" id="firstname" name="firstname" placeholder="First Name" style={textfieldStyle} onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your first name.</b> </label>
                                                 </section>
                                                 <section>
-                                                    <label className="input"> <i className="icon-append fa fa-user"/>
-                                                    <input type="text" id="lastname" name="lastname" placeholder="Last Name" onChange={this.onInputValueChanged} />
+                                                    <label className="input">
+                                                    <input type="text" id="lastname" name="lastname" placeholder="Last Name" style={textfieldStyle} onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your last name.</b> </label>
                                                 </section>
                                                 <section>
-                                                    <label className="input"> <i className="icon-append fa fa-envelope"/>
-                                                    <input type="email" id="email" name="email" placeholder="Email" onChange={this.onInputValueChanged} />
+                                                    <label className="input">
+                                                    <input type="email" id="email" name="email" placeholder="Email" style={textfieldStyle} onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your email address.</b> </label>
                                                 </section>
                                                 <section>
-                                                    <label className="input"> <i className="icon-append fa fa-lock"/>
-                                                    <input type="password" id="password" name="password" placeholder="Password" onChange={this.onInputValueChanged} />
+                                                    <label className="input">
+                                                    <input type="password" id="password" name="password" placeholder="Password" style={textfieldStyle} onChange={this.onInputValueChanged} />
                                                     <b className="tooltip tooltip-bottom-right">Please enter your password.</b> </label>
                                                 </section>
                                                 <section>
-                                                    <label className="input"> <i className="icon-append fa fa-lock"/>
-                                                    <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password" />
+                                                    <label className="input">
+                                                    <input type="password" id="passwordConfirm" name="passwordConfirm" style={textfieldStyle} placeholder="Confirm password" />
                                                     <b className="tooltip tooltip-bottom-right">Please confirm your password.</b> </label>
                                                 </section>
                                             </fieldset>
@@ -234,7 +235,7 @@ class Register extends React.Component {
                                                 <section>
                                                     <label className="checkbox">
                                                     <input type="checkbox" name="terms" id="terms" value="off"/>
-                                                    <i/>I agree with the <a href="#" data-toggle="modal" data-target="#myModal">
+                                                    <i/>I agree with the <a data-toggle="modal" data-target="#myModal">
                                                         Terms and Conditions </a></label>
                                                 </section>
                                             </fieldset>

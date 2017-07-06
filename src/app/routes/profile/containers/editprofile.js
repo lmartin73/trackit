@@ -9,6 +9,7 @@ import { smallAlertMessage } from '../../../components/alert-messaging/AlertMess
 import { updateUserProfile } from './ProfileActions'
 import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 import { PROFILE_UPDATED } from './ProfileConstants'
+import { bigCirclePhotoStyle, boxShadowStyle, backgroundImageStyle, textfieldStyle } from '../../../components/styles/styles'
 
 
 const mapStateToProps = (state) => {
@@ -219,147 +220,129 @@ class EditProfile extends React.Component {
         }
 
         return(
-            <div id="content">
-                <br/>
-                <div className="row">
-                    <article className="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                        <JarvisWidget editbutton={false} custombutton={false}>
-                            <header>
-                                <span className="widget-icon"> <i className="fa fa-edit"/> </span>
-                                <h2>Edit Profile</h2>
-                            </header>
-                            <div>
-                                <div className="widget-body no-padding">
-                                    <UiValidate options={this.validationOptions}>
-                                        <form id="checkout-form" className="smart-form" noValidate="novalidate">
-                                            <fieldset>
-                                                <div className="row">
-                                                    <div className="text-center">
-                                                        <div className="">
-                                                            <img className="img-thumbnail" name="image" ref="image" style={{objectFit: 'cover', height: "120px", width: "120px"}} src={this.state.photoURL}/><br/>
-                                                        </div>
-                                                        <label className="btn btn-link">Select Photo
-                                                            <input type="file" name="imageSelect" ref="imageSelect" style={{display: 'none'}} onChange={this.photoHandler}/>
-                                                        </label><br/><br/>
-                                                    </div>
+            <div id="content" className="container-fluid animated fadeInDown">
+                <h3 className="text-center text-danger">Edit Profile</h3><hr/>
+                    <div className="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1" style={boxShadowStyle}>
+                        <UiValidate options={this.validationOptions}>
+                            <form id="checkout-form" className="smart-form" noValidate="novalidate">
+                                <fieldset>
+                                    <div className="row">
+                                        <div className="col-lg-4 col-md-4">
+                                            <div className="text-center">
+                                                <div className="">
+                                                    <img className="img-thumbnail" name="image" ref="image" style={bigCirclePhotoStyle} src={this.state.profile.photoURL}/><br/>
                                                 </div>
-                                                <br/>
-                                                <div className="row">
-                                                    <section className="col col-6">
-                                                        <label className="input"> <i className="icon-prepend fa fa-user"/>
-                                                            <input type="text" name="firstname" ref="firstname" placeholder="First Name" defaultValue={this.state.firstname} onChange={this.onChange}/>
-                                                        </label>
-                                                    </section>
-                                                    <section className="col col-6">
-                                                        <label className="input"> <i className="icon-prepend fa fa-user"/>
-                                                            <input type="text" name="lastname" ref="lastname" placeholder="Last Name" defaultValue={this.state.lastname} onChange={this.onChange}/>
-                                                        </label>
-                                                    </section>
-                                                </div>
-                                            </fieldset>
-                                            <fieldset>
-                                                <section>
-                                                    <br/>
-                                                    <label className="input"> <i className="icon-prepend fa fa-envelope-o"/>
-                                                        <input type="email" name="email" ref="email" placeholder="Email" defaultValue={this.state.email} onChange={this.onChange}/>
+                                                <label className="btn btn-link">Select Photo
+                                                    <input type="file" name="imageSelect" ref="imageSelect" style={{display: 'none'}} onChange={this.photoHandler}/>
+                                                </label><br/><br/>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div className="col-lg-8 col-md-8">
+                                            <section className=" col col-xs-6">
+                                                <label className="input">
+                                                    <input type="text" name="firstname" ref="firstname" placeholder="First Name" style={textfieldStyle} defaultValue={this.state.profile.firstname} onChange={this.onChange}/>
+                                                </label>
+                                            </section>
+                                            <section className="col col-xs-6">
+                                                <label className="input">
+                                                    <input type="text" name="lastname" ref="lastname" placeholder="Last Name" style={textfieldStyle} defaultValue={this.state.profile.lastname} onChange={this.onChange}/>
+                                                </label>
+                                            </section>
+                                            <section className="col col-xs-12">
+                                                <label className="input">
+                                                    <input type="email" name="email" ref="email" placeholder="Email" style={textfieldStyle} defaultValue={this.state.profile.email} onChange={this.onChange}/>
+                                                </label>
+                                            </section>
+                                            <section className="col col-xs-6">
+                                                    <label className="input">
+                                                        <input type="tel" name="phone" ref="phone" id="phone" placeholder="Phone" style={textfieldStyle} defaultValue={this.state.profile.phone} onChange={this.onChange} />
                                                     </label>
-                                                </section>
-                                            </fieldset>
-                                            <fieldset>
-                                                <br/>
-                                                <div className="row">
-                                                    <section className="col col-8">
-                                                            <label className="input"> <i className="icon-prepend fa fa-phone"/>
-                                                                <input type="tel" name="phone" ref="phone" id="phone" placeholder="Phone" defaultValue={this.state.phone} onChange={this.onChange} />
-                                                            </label>
-                                                    </section>
-                                                    <section className="col col-4">
-                                                        <label className="select">
-                                                            <select name="phone_type" ref="phone_type" defaultValue={this.state.phone_type} onChange={this.onChange}>
-                                                                <option value="" disabled>Phone Type</option>
-                                                                {phoneTypes.map(function(type) {
-                                                                        return(
-                                                                            <option key={type} value={type}>{type}</option>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </select><i/>
-                                                        </label>
-                                                    </section>
-                                                </div>
-                                            </fieldset>
-                                            <fieldset>
-                                                <br/>
-                                                <div className="row">
-                                                    <section className="col col-6">
-                                                            <label className="input">
-                                                                <input type="text" name="street1" ref="street1" placeholder="Street 1" defaultValue={this.state.street1} onChange={this.onChange}/>
-                                                            </label>
-                                                    </section>
-                                                    <section className="col col-6">
-                                                        <label className="input">
-                                                            <input type="text" name="street2" ref="street2" placeholder="Street 2" defaultValue={this.state.street2} onChange={this.onChange}/>
-                                                        </label>
-                                                    </section>
-                                                </div>
-                                                <div className="row">
-                                                    <section className="col col-6">
-                                                        <label className="input">
-                                                            <input type="text" name="city" ref="city" placeholder="City" defaultValue={this.state.city} onChange={this.onChange}/>
-                                                        </label>
-                                                    </section>
-                                                    <section className="col col-2">
-                                                        <label className="input">
-                                                            <input type="text" name="state" ref="state" id="state" placeholder="State" defaultValue={this.state.state} onChange={this.onChange} onChange={this.onChange}/>
-                                                        </label>
-                                                    </section>
-                                                    <section className="col col-4">
-                                                        <label className="input">
-                                                            <input type="text" name="zip" id="zip" ref="zip" placeholder="Zip" defaultValue={this.state.zip} onChange={this.onChange}/>
-                                                        </label>
-                                                    </section>
-                                                </div>
-                                                <div className="row">
-                                                    <section className="col col-8">
-                                                        <label className="select">
-                                                            <select name="country" ref="country" defaultValue={this.state.country} onChange={this.onChange}>
-                                                                <option value="" disabled>Country</option>
-                                                                    {countries.map((country)=>{
-                                                                        return <option key={country.key} value={country.value}>{country.value}</option>
-                                                                        })
-                                                                    }
-                                                            </select><i/>
-                                                        </label>
-                                                    </section>
-                                                    <section className="col col-4">
-                                                        <label className="select">
-                                                            <select name="address_type" ref="address_type" defaultValue={this.state.address_type} onChange={this.onChange}>
-                                                                <option value="" disabled>Address Type</option>
-                                                                {addressTypes.map(function(type) {
-                                                                        return(
-                                                                            <option key={type} value={type}>{type}</option>
-                                                                        )
-                                                                    })
-                                                                }
-                                                            </select><i/>
-                                                        </label>
-                                                    </section>
-                                                </div>
-                                            </fieldset>
-                                            <fieldset>
-                                                <br/><p>All required fields must be completed before saving.</p><br/>
-                                            </fieldset>
-                                            <footer>
-                                                <button type="submit" className="btn btn-primary">Save Changes</button>
-                                                <button type="button" className="btn btn-default">Cancel</button>
-                                            </footer>
-                                        </form>
-                                    </UiValidate>
-                                </div>
-                            </div>
-                        </JarvisWidget>
-                    </article>
-                </div>
+                                            </section>
+                                            <section className="col col-xs-6">
+                                                <label className="select">
+                                                    <select name="phone_type" ref="phone_type" style={textfieldStyle} defaultValue={this.state.profile.phone_type} onChange={this.onChange}>
+                                                        <option value="" disabled>Phone Type</option>
+                                                        {phoneTypes.map(function(type) {
+                                                                return(
+                                                                    <option key={type} value={type}>{type}</option>
+                                                                )
+                                                            })
+                                                        }
+                                                    </select><i/>
+                                                </label>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <br/>
+                                    <div className="row">
+                                        <section className="col col-6">
+                                                <label className="input">
+                                                    <input type="text" name="street1" ref="street1" placeholder="Street 1" style={textfieldStyle} defaultValue={this.state.profile.street1} onChange={this.onChange}/>
+                                                </label>
+                                        </section>
+                                        <section className="col col-6">
+                                            <label className="input">
+                                                <input type="text" name="street2" ref="street2" placeholder="Street 2" style={textfieldStyle} defaultValue={this.state.profile.street2} onChange={this.onChange}/>
+                                            </label>
+                                        </section>
+                                    </div>
+                                    <div className="row">
+                                        <section className="col col-6">
+                                            <label className="input">
+                                                <input type="text" name="city" ref="city" placeholder="City" style={textfieldStyle} defaultValue={this.state.profile.city} onChange={this.onChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col col-2">
+                                            <label className="input">
+                                                <input type="text" name="state" ref="state" id="state" placeholder="State" style={textfieldStyle} defaultValue={this.state.profile.state} onChange={this.onChange} onChange={this.onChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col col-4">
+                                            <label className="input">
+                                                <input type="text" name="zip" id="zip" ref="zip" placeholder="Zip" style={textfieldStyle} defaultValue={this.state.profile.zip} onChange={this.onChange}/>
+                                            </label>
+                                        </section>
+                                    </div>
+                                    <div className="row">
+                                        <section className="col col-8">
+                                            <label className="select">
+                                                <select name="country" ref="country" style={textfieldStyle} defaultValue={this.state.profile.country} onChange={this.onChange}>
+                                                    <option value="" disabled>Country</option>
+                                                        {countries.map((country)=>{
+                                                            return <option key={country.key} value={country.value}>{country.value}</option>
+                                                            })
+                                                        }
+                                                </select><i/>
+                                            </label>
+                                        </section>
+                                        <section className="col col-4">
+                                            <label className="select">
+                                                <select name="address_type" ref="address_type" style={textfieldStyle} defaultValue={this.state.profile.address_type} onChange={this.onChange}>
+                                                    <option value="" disabled>Address Type</option>
+                                                    {addressTypes.map(function(type) {
+                                                            return(
+                                                                <option key={type} value={type}>{type}</option>
+                                                            )
+                                                        })
+                                                    }
+                                                </select><i/>
+                                            </label>
+                                        </section>
+                                    </div>
+                                </fieldset>
+                                <fieldset>
+                                    <br/><p>All required fields must be completed before saving.</p><br/>
+                                </fieldset>
+                                <footer>
+                                    <button type="submit" className="btn btn-primary">Save Changes</button>
+                                    <button type="button" className="btn btn-default">Cancel</button>
+                                </footer>
+                            </form>
+                        </UiValidate>
+                    </div>
             </div>
         )
     }

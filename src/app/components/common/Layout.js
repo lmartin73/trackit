@@ -19,7 +19,6 @@ export default class Layout extends React.Component {
         <Navigation />
         <div id="main" role="main">
           <LayoutSwitcher />
-          <Ribbon />
 
           {this.props.children}
         </div>
