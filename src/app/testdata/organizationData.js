@@ -28,7 +28,9 @@ export const organization = {
 export const owner = {
     firstname: 'Jordan',
     lastname: 'Hubbard',
-    photoURL: 'assets/img/avatars/user.png'
+    photoURL: 'assets/img/avatars/user.png',
+    email: "jhubb95@yahoo.com",
+    phone: "(601) 454-4734"
 }
 
 export const administrators = [

@@ -4,20 +4,23 @@ import { connect } from 'react-redux'
 import countries from '../../../components/forms/commons/countries'
 import { phoneTypes, addressTypes, fileDefs }  from '../../../components/forms/commons/form_defines'
 import UiValidate from '../../../components/forms/validation/UiValidate'
-import JarvisWidget from '../../../components/widgets/JarvisWidget'
 import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
 import { updateUserProfile } from './ProfileActions'
 import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 import { PROFILE_UPDATED } from './ProfileConstants'
-import { bigCirclePhotoStyle, boxShadowStyle, backgroundImageStyle, textfieldStyle } from '../../../components/styles/styles'
+import { bigCirclePhotoStyle, boxShadowStyle, textfieldStyle } from '../../../components/styles/styles'
 
 
 const mapStateToProps = (state) => {
-    /*
-        Maps redux states to local props
-        - profile: current user profile
-        - profile_loading: boolean if profile is loading or not
-        - profile_state: current state of the profile
+    /* Maps redux states to local props
+
+    args:
+        state: app state from the redux store
+    returns:
+        dict object with the following attributes:
+            - profile: current user profile
+            - profile_loading: boolean if profile is loading or not
+            - profile_state: current state of the profile
     */
     return {
         profile: state.profile.profile,
@@ -27,10 +30,14 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    /*
-        Maps the redux dispatch calls to local props
-        - update_profile: dispatch update user profile action
-        - back_to_profile: redirects to profile route
+    /* Maps the redux dispatch calls to local props
+
+    args:
+        dispatch: dispatch action method from the redux store
+    returns:
+        dict object with the following attributes:
+            - update_profile: method to update the user profile with the modified information
+            - back_to_profile: method to push the `profile` route to the DOM
     */
     return {
         update_profile: (profile) => {dispatch(updateUserProfile(profile))},
@@ -39,16 +46,26 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 class EditProfile extends React.Component {
-    /*
-        Allows user to edit their profile information
-    */
+    // Component to allow user to edit their profile information
+
     constructor(props) {
+        /*Init method for this component
+
+        args:
+            props: props passed to this component
+        */
         super(props);
+
         // Bind methods to this
         this.photoHandler = this.photoHandler.bind(this);
         this.onChange = this.onInputChange.bind(this);
 
-        // Initialize local state
+        /* The profile object in the local state is initialized to the
+            current profile object in the redux store
+                - This allows initializing the state to be much easier
+                - This also allows the local state to already have the correct
+                    data structure for the profile
+        */
         this.state = {
             profile: this.props.profile
         }
@@ -133,8 +150,13 @@ class EditProfile extends React.Component {
                 }
             },
             submitHandler: function(form) {
-                /*
-                    Form validation is successful at this point
+                /* action handler for form submission
+
+                    The modified data used to submit this data is located in `this.state.profile`
+                    - We need to bind this method to the `this` pointer of this component
+                        so we can access the methods and data of this component
+                args:
+                    form: javascript form object
                 */
                 this.props.update_profile(this.state.profile)
             }.bind(this)
@@ -142,9 +164,14 @@ class EditProfile extends React.Component {
     }
 
     componentWillReceiveProps(newprops) {
-        /*
-            Used as a handler for profile updated changes
-            - If profile state is profile_updated, call back_to_profile
+        /* Action handler for prop updates
+
+            Here, we can check the updated profile state
+            - if it has successfully updated, then we can go back to the profile route
+              and show a nice little success alert message :)
+
+        args:
+            newprops: props passed to this component
         */
         if (newprops.profile_state === PROFILE_UPDATED) {
             var message_title = 'Successful'
@@ -156,18 +183,27 @@ class EditProfile extends React.Component {
     }
 
     photoHandler(event) {
-        /*
-            Method handler when new photo is selected for profile image
+        /* Action handler for when a new file (photo) is selected
             - Todo: Fix image rendering issue. Some iamges render rotated 90 deg, due to image metadata
+
+        args:
+            event: javascript event
         */
         event.preventDefault();
         var reader = new FileReader();
         reader.onload = function (e) {
+            /* Call back method for when file successfully loads as data URL
+
+            args:
+                e: javascript event
+            */
+            // Update photoURL
             this.setState({profile: {photoURL: e.target.result}});
         }.bind(this)
         if (this.refs.imageSelect.files.length == fileDefs.SELECTED_FILES_COUNT) {
             var file = this.refs.imageSelect.files[fileDefs.SELECTED_FILE_INDEX];
             if (file.size <= fileDefs.MAX_FILE_SIZE) {
+                // Read file and convert to url
                 reader.readAsDataURL(file);
             } else {
                 // Custom alert box if file too large
@@ -180,12 +216,16 @@ class EditProfile extends React.Component {
     }
 
     onInputChange(event) {
-        /*
-            Used for input masking (phone and state)
+        /* Action handler for when any input value changes
 
-            - If phone has 7 digits, adds dash
-            - If phone has 10 digits, adds parenthesis and dash
-            - Convert state to uppercase
+        This method is used to update the selected field in the profile object
+        and is also used for handling input masking on the `phone` and `state` fields of the profile
+            - If phone has 7 digits, adds a dash to the phone number string
+            - If phone has 10 digits, addes parenthesis and dash to phone number string
+            - If state has changed, convert state string to uppercase
+
+        args:
+            event: javascript event
         */
         event.preventDefault();
         var profile_key = 'profile';
@@ -214,6 +254,8 @@ class EditProfile extends React.Component {
     }
 
     render() {
+        // Renders the data to the DOM
+
         // Show loading spinner with specified text if profile is loading/updating
         if (this.props.profile_loading) {
             return <LoadingSpinner text='Saving profile...' />
@@ -222,107 +264,59 @@ class EditProfile extends React.Component {
         return(
             <div id="content" className="container-fluid animated fadeInDown">
                 <h3 className="text-center text-danger">Edit Profile</h3><hr/>
-                    <div className="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1" style={boxShadowStyle}>
-                        <UiValidate options={this.validationOptions}>
-                            <form id="checkout-form" className="smart-form" noValidate="novalidate">
-                                <fieldset>
-                                    <div className="row">
-                                        <div className="col-lg-4 col-md-4">
-                                            <div className="text-center">
-                                                <div className="">
-                                                    <img className="img-thumbnail" name="image" ref="image" style={bigCirclePhotoStyle} src={this.state.profile.photoURL}/><br/>
-                                                </div>
-                                                <label className="btn btn-link">Select Photo
-                                                    <input type="file" name="imageSelect" ref="imageSelect" style={{display: 'none'}} onChange={this.photoHandler}/>
-                                                </label><br/><br/>
+                <div className="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1" style={boxShadowStyle}>
+                    <UiValidate options={this.validationOptions}>
+                        <form id="checkout-form" className="smart-form" noValidate="novalidate">
+                            <fieldset>
+                                <div className="row">
+                                    <div className="col-lg-4 col-md-4">
+                                        <div className="text-center">
+                                            <div className="">
+                                                <img className="img-thumbnail" name="image" style={bigCirclePhotoStyle} src={this.state.profile.photoURL}/><br/>
                                             </div>
-                                        </div>
-                                        <br/>
-                                        <div className="col-lg-8 col-md-8">
-                                            <section className=" col col-xs-6">
-                                                <label className="input">
-                                                    <input type="text" name="firstname" ref="firstname" placeholder="First Name" style={textfieldStyle} defaultValue={this.state.profile.firstname} onChange={this.onChange}/>
-                                                </label>
-                                            </section>
-                                            <section className="col col-xs-6">
-                                                <label className="input">
-                                                    <input type="text" name="lastname" ref="lastname" placeholder="Last Name" style={textfieldStyle} defaultValue={this.state.profile.lastname} onChange={this.onChange}/>
-                                                </label>
-                                            </section>
-                                            <section className="col col-xs-12">
-                                                <label className="input">
-                                                    <input type="email" name="email" ref="email" placeholder="Email" style={textfieldStyle} defaultValue={this.state.profile.email} onChange={this.onChange}/>
-                                                </label>
-                                            </section>
-                                            <section className="col col-xs-6">
-                                                    <label className="input">
-                                                        <input type="tel" name="phone" ref="phone" id="phone" placeholder="Phone" style={textfieldStyle} defaultValue={this.state.profile.phone} onChange={this.onChange} />
-                                                    </label>
-                                            </section>
-                                            <section className="col col-xs-6">
-                                                <label className="select">
-                                                    <select name="phone_type" ref="phone_type" style={textfieldStyle} defaultValue={this.state.profile.phone_type} onChange={this.onChange}>
-                                                        <option value="" disabled>Phone Type</option>
-                                                        {phoneTypes.map(function(type) {
-                                                                return(
-                                                                    <option key={type} value={type}>{type}</option>
-                                                                )
-                                                            })
-                                                        }
-                                                    </select><i/>
-                                                </label>
-                                            </section>
+                                            <label className="btn btn-link">Select Photo
+                                                <input type="file" name="imageSelect" ref="imageSelect" style={{display: 'none'}} onChange={this.photoHandler}/>
+                                            </label><br/><br/>
                                         </div>
                                     </div>
-                                </fieldset>
-                                <fieldset>
                                     <br/>
-                                    <div className="row">
-                                        <section className="col col-6">
+                                    <div className="col-lg-8 col-md-8">
+                                        <section className="col col-xs-6">
+                                            <label className="input">
+                                                <input type="text" name="firstname" placeholder="First Name" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.firstname}
+                                                                            onChange={this.onChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col col-xs-6">
+                                            <label className="input">
+                                                <input type="text" name="lastname" placeholder="Last Name" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.lastname}
+                                                                            onChange={this.onChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col col-xs-12">
+                                            <label className="input">
+                                                <input type="email" name="email" placeholder="Email" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.email}
+                                                                            onChange={this.onChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col col-xs-6">
                                                 <label className="input">
-                                                    <input type="text" name="street1" ref="street1" placeholder="Street 1" style={textfieldStyle} defaultValue={this.state.profile.street1} onChange={this.onChange}/>
+                                                    <input type="tel" name="phone" placeholder="Phone" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.phone}
+                                                                            onChange={this.onChange} />
                                                 </label>
                                         </section>
-                                        <section className="col col-6">
-                                            <label className="input">
-                                                <input type="text" name="street2" ref="street2" placeholder="Street 2" style={textfieldStyle} defaultValue={this.state.profile.street2} onChange={this.onChange}/>
-                                            </label>
-                                        </section>
-                                    </div>
-                                    <div className="row">
-                                        <section className="col col-6">
-                                            <label className="input">
-                                                <input type="text" name="city" ref="city" placeholder="City" style={textfieldStyle} defaultValue={this.state.profile.city} onChange={this.onChange}/>
-                                            </label>
-                                        </section>
-                                        <section className="col col-2">
-                                            <label className="input">
-                                                <input type="text" name="state" ref="state" id="state" placeholder="State" style={textfieldStyle} defaultValue={this.state.profile.state} onChange={this.onChange} onChange={this.onChange}/>
-                                            </label>
-                                        </section>
-                                        <section className="col col-4">
-                                            <label className="input">
-                                                <input type="text" name="zip" id="zip" ref="zip" placeholder="Zip" style={textfieldStyle} defaultValue={this.state.profile.zip} onChange={this.onChange}/>
-                                            </label>
-                                        </section>
-                                    </div>
-                                    <div className="row">
-                                        <section className="col col-8">
+                                        <section className="col col-xs-6">
                                             <label className="select">
-                                                <select name="country" ref="country" style={textfieldStyle} defaultValue={this.state.profile.country} onChange={this.onChange}>
-                                                    <option value="" disabled>Country</option>
-                                                        {countries.map((country)=>{
-                                                            return <option key={country.key} value={country.value}>{country.value}</option>
-                                                            })
-                                                        }
-                                                </select><i/>
-                                            </label>
-                                        </section>
-                                        <section className="col col-4">
-                                            <label className="select">
-                                                <select name="address_type" ref="address_type" style={textfieldStyle} defaultValue={this.state.profile.address_type} onChange={this.onChange}>
-                                                    <option value="" disabled>Address Type</option>
-                                                    {addressTypes.map(function(type) {
+                                                <select name="phone_type" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.phone_type}
+                                                                            onChange={this.onChange}>
+                                                    <option value="" disabled>Phone Type</option>
+                                                    {
+                                                        phoneTypes.map(function(type) {
                                                             return(
                                                                 <option key={type} value={type}>{type}</option>
                                                             )
@@ -332,17 +326,96 @@ class EditProfile extends React.Component {
                                             </label>
                                         </section>
                                     </div>
-                                </fieldset>
-                                <fieldset>
-                                    <br/><p>All required fields must be completed before saving.</p><br/>
-                                </fieldset>
-                                <footer>
-                                    <button type="submit" className="btn btn-primary">Save Changes</button>
-                                    <button type="button" className="btn btn-default">Cancel</button>
-                                </footer>
-                            </form>
-                        </UiValidate>
-                    </div>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <br/>
+                                <div className="row">
+                                    <section className="col col-6">
+                                            <label className="input">
+                                                <input type="text" name="street1" placeholder="Street 1"
+                                                                            style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.street1}
+                                                                            onChange={this.onChange}/>
+                                            </label>
+                                    </section>
+                                    <section className="col col-6">
+                                        <label className="input">
+                                            <input type="text" name="street2" placeholder="Street 2"
+                                                                            style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.street2}
+                                                                            onChange={this.onChange}/>
+                                        </label>
+                                    </section>
+                                </div>
+                                <div className="row">
+                                    <section className="col col-6">
+                                        <label className="input">
+                                            <input type="text" name="city" placeholder="City"
+                                                                            style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.city}
+                                                                            onChange={this.onChange}/>
+                                        </label>
+                                    </section>
+                                    <section className="col col-2">
+                                        <label className="input">
+                                            <input type="text" name="state" placeholder="State"
+                                                                            style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.state}
+                                                                            onChange={this.onChange}/>
+                                        </label>
+                                    </section>
+                                    <section className="col col-4">
+                                        <label className="input">
+                                            <input type="text" name="zip" placeholder="Zip" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.zip}
+                                                                            onChange={this.onChange}/>
+                                        </label>
+                                    </section>
+                                </div>
+                                <div className="row">
+                                    <section className="col col-8">
+                                        <label className="select">
+                                            <select name="country" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.country}
+                                                                            onChange={this.onChange}>
+                                                <option value="" disabled>Country</option>
+                                                    {
+                                                        countries.map((country) => {
+                                                            return <option key={country.key} value={country.value}>{country.value}</option>
+                                                        })
+                                                    }
+                                            </select><i/>
+                                        </label>
+                                    </section>
+                                    <section className="col col-4">
+                                        <label className="select">
+                                            <select name="address_type" style={textfieldStyle}
+                                                                            defaultValue={this.state.profile.address_type}
+                                                                            onChange={this.onChange}>
+                                                <option value="" disabled>Address Type</option>
+                                                {
+                                                    addressTypes.map(function(type) {
+                                                        return(
+                                                            <option key={type} value={type}>{type}</option>
+                                                        )
+                                                    })
+                                                }
+                                            </select><i/>
+                                        </label>
+                                    </section>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <br/><p>All required fields must be completed before saving.</p><br/>
+                            </fieldset>
+                            <footer style={{backgroundColor: "white"}}>
+                                <button type="submit" className="btn btn-primary">Save Changes</button>
+                                <button type="button" className="btn btn-default">Cancel</button>
+                            </footer>
+                        </form>
+                    </UiValidate>
+                </div>
             </div>
         )
     }

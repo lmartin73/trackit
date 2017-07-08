@@ -6,7 +6,16 @@ import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinn
 
 
 const mapStateToProps = (state) => {
-    // Maps redux states to local props
+    /* Maps redux states to local props
+
+    args:
+        state: app state from the redux store
+    returns:
+        dict object with the following attributes:
+            - enrolledOrgs: list of dict objects (organization data) indexed with organization id
+            - pendingOrgs: list of dict objects (organization data) indexed with organization id
+            - profile_loading: boolean for whether the profile is loading or not
+    */
     return {
         enrolledOrgs: state.profile.profile.enrolledOrgs,
         pendingOrgs: state.profile.profile.pendingOrgs,
@@ -15,7 +24,15 @@ const mapStateToProps = (state) => {
 }
 
 const mapDispatchToProps = (dispatch) => {
-    // Maps the redux dispatch calls to local props
+    /* Maps the redux dispatch calls to local props
+
+    args:
+        dispatch: dispatch action method from the redux store
+    returns:
+        dict object with the following attributes:
+            - goToDetails: method to push the `detail org` route to the DOM, passing
+                in the organization id
+    */
     return {
         goToDetails: (orgUID) => {
             dispatch(push({
@@ -29,20 +46,32 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 class ListOrgsContainer extends React.Component {
-    // Component to list organizations current user is associated with
+    /* Container component for list of organizations user is associated with
+
+        This container component loads organizations data from the user's profile before rendering
+        the data to the DOM using the stateless `list organizations` component...
+    */
 
     constructor() {
+        // Init method for this component
         super();
+
         // Bind methods to this pointer
         this.orgClicked = this.onOrganizationClicked.bind(this);
     }
 
     onOrganizationClicked(orgUID) {
-        // Directs user to organization that was clicked
+        /* Action handler for when any organization div is clicked
+
+        args:
+            orgUID: organization id
+        */
         this.props.goToDetails(orgUID)
     }
 
     render() {
+        // Renders the data to the DOM
+
         // Show loading spinner with specified text if profile loading
         if (this.props.profile_loading) {
             return <LoadingSpinner text='Loading organizations...' />
@@ -50,7 +79,8 @@ class ListOrgsContainer extends React.Component {
 
         return(
             <ListOrganizations enrolledOrgs={this.props.enrolledOrgs}
-                               pendingOrgs={this.props.pendingOrgs} orgClicked={this.orgClicked} />
+                               pendingOrgs={this.props.pendingOrgs}
+                               orgClicked={this.orgClicked} />
         )
     }
 }

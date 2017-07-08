@@ -2,22 +2,39 @@ import React from 'react'
 import { push } from 'react-router-redux'
 import { connect } from 'react-redux'
 import { DetailOrgComponent } from '../components/DetailOrgComponent'
-import { SmartMessageBox } from "../../../components/utils/actions/MessageActions";
 import Organization from '../../../_be/organizations/Organization'
 import { UserProfile } from '../../../_be/auth/useracct'
 import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
+import { SmartMessageBox } from "../../../components/utils/actions/MessageActions"
 
 
 const mapStateToProps = (state, ownProps) => {
-    // Maps redux states to local props
+    /* Maps redux states to local props
+
+    args:
+        state: app state from the redux store
+        ownProps: props passed to component through pushing route
+    returns:
+        dict object with the following attributes:
+            - orgUID: selected organization id
+    */
     return {
         orgUID: ownProps.location.query.orgUID
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
-    // Maps the redux dispatch calls to local props
+    /* Maps the redux dispatch calls to local props
+
+    args:
+        dispatch: dispatch action method from the redux store
+    returns:
+        dict object with the following attributes:
+            - dispatch_route: method to push a route to the DOM
+            - goToEdit: method to push the `edit org` route to the DOM, passing
+                in the organization id
+    */
     return {
         dispatch_route: (route) => {
             dispatch(push(route))
@@ -34,21 +51,46 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 class DetailOrgContainer extends React.Component {
-    // Component to display details about selected organization
+    /* Container component to display details about selected organization
+
+        This component loads information about the selected organization using the
+        organizatio id (passed to props from previous component) and renders the data
+        to the DOM...
+
+        Todo: add action method for user profile clicked
+    */
 
     constructor(props) {
+        /* Init method of this component
+
+        args:
+            props: props passed to this component
+        */
         super(props);
+
         // Bind methods to this pointer
         this.editClicked = this.onEditClicked.bind(this);
         this.leaveClicked = this.onLeaveClicked.bind(this);
 
-        // Initialize state
+        /* Initialize local state
+            - orgLoaded: boolean (used for re-rendering the DOM once organization data has been load)
+                Hence, orgLoaded is set to true once data has loaded
+        */
         this.state = {
             orgLoaded: false
         }
     }
 
     componentDidMount() {
+        /* action method called when the component has mounted to the DOM
+
+            This method is used to do the following:
+                - Load organizatio data
+                - Set owner profile using owner uid
+                - Iterate through administrator uids and create a list of administrator profiles
+                - Iterate through member uids and create a list of member profiles
+        */
+
         // Get organization information
         this.organization = new Organization(this.props.orgUID);
 
@@ -65,17 +107,17 @@ class DetailOrgContainer extends React.Component {
             this.administrators.push(profile);
         }
 
-        // Update state to render detail component
+        // Update orgLoaded field in this.state to render organization details
         this.setState({orgLoaded: true})
     }
 
     onEditClicked() {
-        // Edit organization action
+        // Action handler for edit organization button click
         this.props.goToEdit(this.props.orgUID);
     }
 
     onLeaveClicked() {
-        // remove organization action
+        // Action handler for leave organization button click
         SmartMessageBox({
             title: "Sure?",
             content: "Are you sure you want to leave this organization?",
@@ -97,14 +139,20 @@ class DetailOrgContainer extends React.Component {
     }
 
     render() {
+        // Renders the data to the DOM
+
+        // Show loading spinner with specified text if organization data is loading
         if (!this.state.orgLoaded) {
             return <LoadingSpinner text="Loading organization..." />
         }
 
         return(
-            <DetailOrgComponent org={this.organization} owner={this.owner} administrators={this.administrators}
+            <DetailOrgComponent org={this.organization}
+                                owner={this.owner}
+                                administrators={this.administrators}
                                 members={this.members}
-                                editClicked={this.editClicked} leaveClicked={this.leaveClicked}/>
+                                editClicked={this.editClicked}
+                                leaveClicked={this.leaveClicked}/>
         )
     }
 }

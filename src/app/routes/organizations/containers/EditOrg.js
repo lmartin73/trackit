@@ -1,7 +1,6 @@
 import React from 'react'
 import { push, goBack } from 'react-router-redux'
 import { connect } from 'react-redux'
-import { BigBreadcrumbs } from '../../../components'
 import JarvisWidget from '../../../components/widgets/JarvisWidget'
 import UiValidate from '../../../components/forms/validation/UiValidate'
 import countries from '../../../components/forms/commons/countries'
@@ -9,19 +8,33 @@ import { fileDefs }  from '../../../components/forms/commons/form_defines'
 import Organization from '../../../_be/organizations/Organization'
 import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
+import { bigCirclePhotoStyle, boxShadowStyle, backgroundImageStyle, textfieldStyle } from '../../../components/styles/styles'
 
 
 const mapStateToProps = (state, ownProps) => {
-    // Maps redux states to local props
+    /* Maps redux states to local props
+
+    args:
+        state: app state from the redux store
+        ownProps: props passed to component through pushing route
+    returns:
+        dict object with the following attributes:
+            - orgUID: organization id
+    */
     return {
         orgUID: ownProps.location.query.orgUID
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
-    /*
-        Maps the redux dispatch calls to local props
-        - Todo: return update_profile method
+    /* Maps the redux dispatch calls to local props
+
+    args:
+        dispatch: dispatch action method from the redux store
+    returns:
+        dict object with the following attributes:
+            - dispatch_route: method to push a route to the DOM
+            - cancel_udpate: method to cancel changes and go back to `organization details`
     */
     return {
         dispatch_route: (route) => {
@@ -34,21 +47,30 @@ const mapDispatchToProps = (dispatch) => {
 }
 
 class EditOrg extends React.Component {
-    /*
-        Component to allow user to edit organization profile
-    */
+    // Component to allow user to edit organization profile
+
     constructor(props) {
+        /* Init method for this component
+
+        args:
+            props: props passed to this component
+        */
         super(props);
+
         // Bind methods to this pointer
         this.logoHandler = this.logoHandler.bind(this);
         this.onInputChange = this.onInputChange.bind(this);
         this.mailingAddressCheckboxHandler = this.mailingAddressCheckboxHandler.bind(this);
 
+        // Initialize new organization object
         this.organization = new Organization(this.props.orgUID);
 
-        // Initialize local state
+        /*Initialize local state
+            - organization: initialized to organization object that was created
+            - mailingAddressChecked: boolean reflecting if mailing address is the same as
+                physical address or not
+        */
         this.state = {
-            // Todo: subject to change. Setting to organization object may be too much
             organization: this.organization,
             mailingAddressChecked: false
         }
@@ -148,10 +170,15 @@ class EditOrg extends React.Component {
                 }
             },
             submitHandler: function(form) {
-                /*
-                    All validation is successful
-                    Update organization information
-                    - Todo: may need to modify updateOrganizationInfo method to have a call back
+                /* action handler for form submission
+
+                    The modified data used to submit this data is located in `this.state.organization`
+                    - We need to bind this method to the `this` pointer of this component
+                        so we can access the methods and data of this component
+                    - After success, dispatch `detail organization` route, passing in the same orgUID so that the
+                        new `detail organization` component is rendered with the new data
+                args:
+                    form: javascript form object
                 */
                 this.organization.updateOrganizationInfo(this.state.organization);
                 var message_title = 'Success'
@@ -169,18 +196,29 @@ class EditOrg extends React.Component {
     }
 
     logoHandler(event) {
-        /*
-            handler for when user selects new photo for organization logo
-            - Todo: fix image rendering issue. Some images render rotated 90 deg, due to image metadata
+        /* Action handler for when a new file (photo) is selected
+            - Todo: Fix image rendering issue. Some iamges render rotated 90 deg, due to image metadata
+
+        args:
+            event: javascript event
         */
         event.preventDefault();
         var reader = new FileReader();
         reader.onload = function (e) {
+            /* Call back method for when file successfully loads as data URL
+
+            args:
+                e: javascript event
+            */
+            // Update photoURL
             this.setState({organization: {logoURL: e.target.result}});
         }.bind(this)
+
+        // Check file meets requirements
         if (this.refs.imageSelect.files.length == fileDefs.SELECTED_FILES_COUNT) {
             var file = this.refs.imageSelect.files[fileDefs.SELECTED_FILE_INDEX];
             if (file.size <= fileDefs.MAX_FILE_SIZE) {
+                // Read file and convert to URL
                 reader.readAsDataURL(file);
             } else {
                 // Custom alert box if file too large
@@ -193,12 +231,16 @@ class EditOrg extends React.Component {
     }
 
     onInputChange(event) {
-        /*
-            Used for input masking (phone and state)
+        /* Action handler for when any input value changes
 
-            - If phone has 7 digits, adds dash
-            - If phone has 10 digits, adds parenthesis and dash
-            - Convert state to uppercase
+        This method is used to update the selected field in the profile object
+        and is also used for handling input masking on the `phone` and `state` fields of the profile
+            - If phone has 7 digits, adds a dash to the phone number string
+            - If phone has 10 digits, addes parenthesis and dash to phone number string
+            - If state has changed, convert state string to uppercase
+
+        args:
+            event: javascript event
         */
         event.preventDefault();
         var org_key = 'organization';
@@ -245,6 +287,12 @@ class EditOrg extends React.Component {
     }
 
     mailingAddressCheckboxHandler(event) {
+        /* Action handler for mailing address `same as physical address` checkbox
+
+        args:
+            event: javascript event
+        */
+        // Update state
         this.setState({mailingAddressChecked: event.target.checked});
         if (event.target.checked) {
             // Copy physical address to mailing address (this.state)
@@ -265,95 +313,151 @@ class EditOrg extends React.Component {
     }
 
     render() {
+        // Renders the data to the DOM
+
         return(
             <div id="content" className="container-fluid animated fadeInDown">
-                <div className="row">
-                    <BigBreadcrumbs items={['Organizations', 'My Organizations', 'org name']} icon="fa fa-fw fa-users"
-                                    className="col-xs-12 col-sm-7 col-md-7 col-lg-4"/>
-                </div>
-                <div className="row">
-                    <article className="col-sm-10 col-sm-offset-1 col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
-                        <JarvisWidget editbutton={false} custombutton={false}>
-                            <header>
-                                <span className="widget-icon"> <i className="fa fa-edit"/> </span>
-                                <h2>Edit Organization</h2>
-                            </header>
-                            <div className="widget-body">
-                                <UiValidate options={this.validationOptions}>
-                                    <form id="checkout-form" className="smart-form" noValidate="novalidate">
-                                        <fieldset>
-                                            <div className="row">
-                                                <div className="col-lg-5 col-md-5 col-sm-5">
-                                                    <div className="text-center">
-                                                        <div>
-                                                            <img className="img-thumbnail" style={{objectFit: 'cover', height: "120px", width: "120px"}} src={''}/><br/>
-                                                        </div>
-                                                        <label className="btn btn-link">Select Logo
-                                                            <input type="file" style={{display: 'none'}} onChange={this.logoHandler}/>
-                                                        </label><br/><br/>
-                                                    </div>
-                                                </div>
-                                                <div className="col-lg-7 col-md-7 col-sm-7">
-                                                    <section className="col-lg-11 col-md-11 col-sm-11">
-                                                        <label className="input"> <i className="icon-prepend fa fa-user"/>
-                                                            <input type="text" name="name" placeholder="Name"
-                                                                                    defaultValue={this.state.organization.name}
-                                                                                    onChange={this.onInputChange}/>
-                                                        </label>
-                                                    </section>
-                                                    <section className="col-lg-11 col-md-11 col-sm-11">
-                                                        <label className="input"> <i className="icon-prepend fa fa-envelope-o"/>
-                                                            <input type="text" name="email" placeholder="Email"
-                                                                                    defaultValue={this.state.organization.email}
-                                                                                    onChange={this.onInputChange}/>
-                                                        </label>
-                                                    </section>
-                                                    <section className="col-lg-11 col-md-11 col-sm-11">
-                                                        <label className="input"> <i className="icon-prepend fa fa-user"/>
-                                                            <input type="text" name="phone" placeholder="Phone"
-                                                                                    defaultValue={this.state.organization.phone}
-                                                                                    onChange={this.onInputChange}/>
-                                                        </label>
-                                                    </section>
-                                                    <section className="col-lg-11 col-md-11 col-sm-11">
-                                                        <label className="input"> <i className="icon-prepend fa fa-user"/>
-                                                            <input type="text" name="fax" placeholder="Fax (optional)"
-                                                                                    defaultValue={this.state.organization.fax}
-                                                                                    onChange={this.onInputChange}/>
-                                                        </label>
-                                                    </section>
-                                                </div>
+                <h3 className="text-center text-danger">Edit Organization</h3><hr/>
+                <div className="col-lg-10 col-lg-offset-1 col-md-10 col-md-offset-1" style={boxShadowStyle}>
+                    <UiValidate options={this.validationOptions}>
+                        <form id="checkout-form" className="smart-form" noValidate="novalidate">
+                            <fieldset>
+                                <div className="row">
+                                    <div className="col-lg-5 col-md-5 col-sm-5">
+                                        <div className="text-center">
+                                            <div>
+                                                <img className="img-thumbnail" name="image" ref="image" style={bigCirclePhotoStyle} src={this.state.organization.logoURL}/><br/>
                                             </div>
-                                            <br/>
-                                        </fieldset>
-                                        <fieldset>
-                                            <h5>Description</h5>
-                                            <br/>
-                                            <div className="row">
-                                                <section className="col col-lg-12 col-md-12 col-sm-12 col-xs-12">
-                                                  <label className="textarea textarea-resizable">
-                                                    <textarea rows="2" name="description"
-                                                        placeholder="Here, include a brief description describing your organization."
-                                                        className="custom-scroll" defaultValue={this.state.organization.description} onChange={this.onInputChange}/>
-                                                  </label>
-                                                </section>
-                                            </div>
-                                        </fieldset>
-                                        <fieldset>
-                                            <h5>Physical Address</h5>
-                                            <br/>
+                                            <label className="btn btn-link">Select Logo
+                                                <input type="file" style={{display: 'none'}} onChange={this.logoHandler}/>
+                                            </label><br/><br/>
+                                        </div>
+                                    </div>
+                                    <div className="col-lg-7 col-md-7 col-sm-7">
+                                        <section className="col-lg-11 col-md-11 col-sm-11">
+                                            <label className="input">
+                                                <input type="text" name="name" placeholder="Name" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.name}
+                                                                        onChange={this.onInputChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col-lg-11 col-md-11 col-sm-11">
+                                            <label className="input">
+                                                <input type="text" name="email" placeholder="Email" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.email}
+                                                                        onChange={this.onInputChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col-lg-11 col-md-11 col-sm-11">
+                                            <label className="input">
+                                                <input type="text" name="phone" placeholder="Phone" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.phone}
+                                                                        onChange={this.onInputChange}/>
+                                            </label>
+                                        </section>
+                                        <section className="col-lg-11 col-md-11 col-sm-11">
+                                            <label className="input">
+                                                <input type="text" name="fax" placeholder="Fax (optional)" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.fax}
+                                                                        onChange={this.onInputChange}/>
+                                            </label>
+                                        </section>
+                                    </div>
+                                </div>
+                                <br/>
+                            </fieldset>
+                            <fieldset>
+                                <h5>Description</h5>
+                                <br/>
+                                <div className="row">
+                                    <section className="col col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                      <label className="textarea textarea-resizable">
+                                        <textarea rows="2" name="description" style={textfieldStyle}
+                                            placeholder="Here, include a brief description describing your organization."
+                                            className="custom-scroll" defaultValue={this.state.organization.description} onChange={this.onInputChange}/>
+                                      </label>
+                                    </section>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <h5>Physical Address</h5>
+                                <br/>
+                                <div className="row">
+                                    <section className="col col-6">
+                                        <label className="input">
+                                            <input type="text" name="p_street1" placeholder="Street 1" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.physicalAddress.street1}
+                                                                        onChange={this.onInputChange}/>
+                                        </label>
+                                    </section>
+                                    <section className="col col-6">
+                                        <label className="input">
+                                            <input type="text" name="p_street2" placeholder="Street 2" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.physicalAddress.street2}
+                                                                        onChange={this.onInputChange}/>
+                                        </label>
+                                    </section>
+                                </div>
+                                <div className="row">
+                                    <section className="col col-3">
+                                        <label className="input">
+                                            <input type="text" name="p_city" placeholder="City" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.physicalAddress.city}
+                                                                        onChange={this.onInputChange}/>
+                                        </label>
+                                    </section>
+                                    <section className="col col-3">
+                                        <label className="input">
+                                            <input type="text" name="p_state" id="state" placeholder="State" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.physicalAddress.state}
+                                                                        onChange={this.onInputChange}/>
+                                        </label>
+                                    </section>
+                                    <section className="col col-3">
+                                        <label className="input">
+                                            <input type="text" name="p_zip" id="zip" placeholder="Zip" style={textfieldStyle}
+                                                                        defaultValue={this.state.organization.physicalAddress.zip}
+                                                                        onChange={this.onInputChange}/>
+                                        </label>
+                                    </section>
+                                    <section className="col col-3">
+                                        <label className="select">
+                                            <select name="p_country" defaultValue={this.state.organization.physicalAddress.country}
+                                                                    style={textfieldStyle} onChange={this.onInputChange}>
+                                                <option value="" disabled>Country</option>
+                                                    {countries.map((country)=>{
+                                                        return <option key={country.key} value={country.value}>{country.value}</option>
+                                                        })
+                                                    }
+                                            </select><i/>
+                                        </label>
+                                    </section>
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <h5>Mailing Address</h5><br/>
+                                <label className="checkbox">
+                                    <input type="checkbox" onChange={this.mailingAddressCheckboxHandler} />
+                                    <i/>Same as physical address
+                                </label>
+                                <br/>
+                                {
+                                    (!this.state.mailingAddressChecked) ? (
+                                        <div>
                                             <div className="row">
                                                 <section className="col col-6">
-                                                    <label className="input">
-                                                        <input type="text" name="p_street1" placeholder="Street 1"
-                                                                                    defaultValue={this.state.organization.physicalAddress.street1}
+                                                        <label className="input">
+                                                            <input type="text" name="m_street1" ref="m_street1" placeholder="Street 1"
+                                                                                    style={textfieldStyle}
+                                                                                    defaultValue={this.state.organization.mailingAddress.street1}
                                                                                     onChange={this.onInputChange}/>
-                                                    </label>
+                                                        </label>
                                                 </section>
                                                 <section className="col col-6">
                                                     <label className="input">
-                                                        <input type="text" name="p_street2" placeholder="Street 2"
-                                                                                    defaultValue={this.state.organization.physicalAddress.street2}
+                                                        <input type="text" name="m_street2" ref="m_street2" placeholder="Street 2"
+                                                                                    style={textfieldStyle}
+                                                                                    defaultValue={this.state.organization.mailingAddress.street2}
                                                                                     onChange={this.onInputChange}/>
                                                     </label>
                                                 </section>
@@ -361,28 +465,32 @@ class EditOrg extends React.Component {
                                             <div className="row">
                                                 <section className="col col-3">
                                                     <label className="input">
-                                                        <input type="text" name="p_city" placeholder="City"
-                                                                                    defaultValue={this.state.organization.physicalAddress.city}
+                                                        <input type="text" name="m_city" ref="m_city" placeholder="City"
+                                                                                    style={textfieldStyle}
+                                                                                    defaultValue={this.state.organization.mailingAddress.city}
                                                                                     onChange={this.onInputChange}/>
                                                     </label>
                                                 </section>
                                                 <section className="col col-3">
                                                     <label className="input">
-                                                        <input type="text" name="p_state" id="state" placeholder="State"
-                                                                                    defaultValue={this.state.organization.physicalAddress.state}
+                                                        <input type="text" name="m_state" ref="m_state" placeholder="State"
+                                                                                    style={textfieldStyle}
+                                                                                    defaultValue={this.state.organization.mailingAddress.state}
                                                                                     onChange={this.onInputChange}/>
                                                     </label>
                                                 </section>
                                                 <section className="col col-3">
                                                     <label className="input">
-                                                        <input type="text" name="p_zip" id="zip" placeholder="Zip"
-                                                                                    defaultValue={this.state.organization.physicalAddress.zip}
+                                                        <input type="text" name="m_zip" ref="m_zip" placeholder="Zip"
+                                                                                    style={textfieldStyle}
+                                                                                    defaultValue={this.state.organization.mailingAddress.zip}
                                                                                     onChange={this.onInputChange}/>
                                                     </label>
                                                 </section>
                                                 <section className="col col-3">
                                                     <label className="select">
-                                                        <select name="p_country" defaultValue={this.state.organization.physicalAddress.country} onChange={this.onInputChange}>
+                                                        <select name="m_country" ref="m_country" defaultValue={this.state.organization.mailingAddress.country}
+                                                                                    style={textfieldStyle} onChange={this.onInputChange}>
                                                             <option value="" disabled>Country</option>
                                                                 {countries.map((country)=>{
                                                                     return <option key={country.key} value={country.value}>{country.value}</option>
@@ -392,85 +500,18 @@ class EditOrg extends React.Component {
                                                     </label>
                                                 </section>
                                             </div>
-                                        </fieldset>
-                                        <fieldset>
-                                            <h5>Mailing Address</h5><br/>
-                                            <label className="checkbox">
-                                                <input type="checkbox" onChange={this.mailingAddressCheckboxHandler} />
-                                                <i/>Same as physical address
-                                            </label>
-                                            <br/>
-                                            {
-                                                (!this.state.mailingAddressChecked) ? (
-                                                    <div>
-                                                        <div className="row">
-                                                            <section className="col col-6">
-                                                                    <label className="input">
-                                                                        <input type="text" name="m_street1" ref="m_street1" placeholder="Street 1"
-                                                                                                defaultValue={this.state.organization.mailingAddress.street1}
-                                                                                                onChange={this.onInputChange}/>
-                                                                    </label>
-                                                            </section>
-                                                            <section className="col col-6">
-                                                                <label className="input">
-                                                                    <input type="text" name="m_street2" ref="m_street2" placeholder="Street 2"
-                                                                                                defaultValue={this.state.organization.mailingAddress.street2}
-                                                                                                onChange={this.onInputChange}/>
-                                                                </label>
-                                                            </section>
-                                                        </div>
-                                                        <div className="row">
-                                                            <section className="col col-3">
-                                                                <label className="input">
-                                                                    <input type="text" name="m_city" ref="m_city" placeholder="City"
-                                                                                                defaultValue={this.state.organization.mailingAddress.city}
-                                                                                                onChange={this.onInputChange}/>
-                                                                </label>
-                                                            </section>
-                                                            <section className="col col-3">
-                                                                <label className="input">
-                                                                    <input type="text" name="m_state" ref="m_state" placeholder="State"
-                                                                                                defaultValue={this.state.organization.mailingAddress.state}
-                                                                                                onChange={this.onInputChange}/>
-                                                                </label>
-                                                            </section>
-                                                            <section className="col col-3">
-                                                                <label className="input">
-                                                                    <input type="text" name="m_zip" ref="m_zip" placeholder="Zip"
-                                                                                                defaultValue={this.state.organization.mailingAddress.zip}
-                                                                                                onChange={this.onInputChange}/>
-                                                                </label>
-                                                            </section>
-                                                            <section className="col col-3">
-                                                                <label className="select">
-                                                                    <select name="m_country" ref="m_country" defaultValue={this.state.organization.mailingAddress.country} onChange={this.onInputChange}>
-                                                                        <option value="" disabled>Country</option>
-                                                                            {countries.map((country)=>{
-                                                                                return <option key={country.key} value={country.value}>{country.value}</option>
-                                                                                })
-                                                                            }
-                                                                    </select><i/>
-                                                                </label>
-                                                            </section>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div></div>
-                                                )
-                                            }
-                                        </fieldset>
-                                        <fieldset>
-                                            <br/><p>All required fields must be completed before saving.</p><br/>
-                                        </fieldset>
-                                        <footer>
-                                            <button type="submit" className="btn btn-primary">Save Changes</button>
-                                            <button type="button" className="btn btn-default" onClick={() => {this.props.cancel_update()}}>Cancel</button>
-                                        </footer>
-                                    </form>
-                                </UiValidate>
-                            </div>
-                        </JarvisWidget>
-                    </article>
+                                        </div>
+                                    ) : (
+                                        <div></div>
+                                    )
+                                }
+                            </fieldset>
+                            <footer style={{backgroundColor: 'white'}}>
+                                <button type="submit" className="btn btn-primary">Save Changes</button>
+                                <button type="button" className="btn btn-default" onClick={() => {this.props.cancel_update()}}>Cancel</button>
+                            </footer>
+                        </form>
+                    </UiValidate>
                 </div>
             </div>
         )

@@ -5,8 +5,19 @@ export const textfieldStyle = {
 export const bigCirclePhotoStyle = {
     height: "120px",
     width: "120px",
-    borderRadius: "50%",
+    borderRadius: "50%"
+}
 
+export const smallCirclePhotoStyle = {
+    height: "45px",
+    width: "45px",
+    borderRadius: "50%"
+}
+
+export const mediumCirclePhotoStyle = {
+    height: "90px",
+    width: "90px",
+    borderRadius: "50%"
 }
 
 export const boxShadowStyle = {
