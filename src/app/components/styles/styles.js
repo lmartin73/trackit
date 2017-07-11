@@ -21,7 +21,8 @@ export const mediumCirclePhotoStyle = {
 }
 
 export const boxShadowStyle = {
-    boxShadow: "0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.24)"
+    boxShadow: "0 0.5px 1px rgba(0, 0, 0, 0.12), 0 1px 1px rgba(0, 0, 0, 0.24)",
+    borderRadius: "10px"
 }
 
 export const backgroundImageStyle = {
