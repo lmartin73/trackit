@@ -44,7 +44,7 @@ firebase.initializeApp(FIRconfig.config);
 
 
 // Activate authentication listener
-store.dispatch(startListeningToAuth());
+//store.dispatch(startListeningToAuth());
 
 
 ReactDOM.render((

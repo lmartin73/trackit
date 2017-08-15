@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import { smallAlertMessage } from '../../../components/alert-messaging/AlertMessaging'
 import { LoadingSpinner } from '../../../components/loading-spinner/LoadingSpinner'
 import Organization from '../../../_be/organizations/Organization'
-import { bigCirclePhotoStyle, boxShadowStyle, backgroundImageStyle, textfieldStyle } from '../../../components/styles/styles'
+import { bigCirclePhotoStyle, boxShadowStyle, textfieldStyle } from '../../../components/styles/styles'
+import { organization } from '../../../testdata/organizationData'
 
 
 // Constants for wizard
@@ -55,20 +56,23 @@ class JoinOrg extends React.Component {
         this.onPreviousClicked = this.onPreviousClicked.bind(this);
         this.handlerWizardReactions = this.handlerWizardReactions.bind(this);
 
-        /*Initialize local state
+        /* Initialize local state
             - organization: data concerning the organization
             - wizard: object including the wizard current and previous step
+            - validationMessage: string that shows at the bottom of the component
+                when input validation is false
         */
         this.state = {
             organization: {
+                orgCode: '',
                 organization: null,
                 orgLoaded: false,
-                orgStatusText: ''
             },
             wizard: {
                 currentStep: 1,
-                prevStep: null
-            }
+                prevStep: 0
+            },
+            validationMessage: ''
         }
     }
 
@@ -87,7 +91,6 @@ class JoinOrg extends React.Component {
         Here, we will submit organization join request and dispatch to list orgs
         The new organization will be appended to the list of pending organizations for the user
             - organization Data is located at `this.state.organization.organization`
-            - user data (if needed) is located at `this.props.profile`
         */
         // Todo: send join organization request
         var message_title = 'Success!'
@@ -108,8 +111,9 @@ class JoinOrg extends React.Component {
             event: javascript onchange event
         */
         event.preventDefault();
+        this.setState({organization: {...this.state.organization, orgCode: event.target.value}});
         if (event.target.value.length >= 12) {
-            this.setState({orgLoaded: true})
+            this.setState({organization: {...this.state.organization, organization: organization, orgLoaded: true}})
         }
     }
 
@@ -125,10 +129,10 @@ class JoinOrg extends React.Component {
         event.preventDefault();
 
         // Validate input field
-        if (this.refs.orgCode.value == "") {
-            this.setState({organization: {orgStatusText: "Organization Code Required"}})
+        if (this.state.organization.orgCode == "") {
+            this.setState({validationMessage: "Organization Code Required"})
             setTimeout(() => {
-                this.setState({organization: {orgStatusText: ''}});
+                this.setState({validationMessage: ''});
             }, TIMEOUT);
             return
         }
@@ -136,9 +140,9 @@ class JoinOrg extends React.Component {
         // Check if organization has loaded
         if (!this.state.organization.orgLoaded) {
             // Show `no organization found` message to DOM for length of TIMEOUT
-            this.setState({organization: {orgStatusText: "No Organization Found. Check Organization Code."}})
+            this.setState({validationMessage: "No Organization Found. Check Organization Code."})
             setTimeout(() => {
-                this.setState({organization: {orgStatusText: ''}});
+                this.setState({validationMessage: ''});
             }, TIMEOUT);
             return
         } else if (this.state.wizard.currentStep == 4) {
@@ -160,11 +164,6 @@ class JoinOrg extends React.Component {
             event: javascript onclick event
         */
         event.preventDefault();
-        if (this.state.wizard.prevStep == null) {
-            event.target.disabled = true;
-            return
-        }
-        // Move to previous step
         this.setStep(this.state.wizard.currentStep - 1);
     }
 
@@ -180,6 +179,7 @@ class JoinOrg extends React.Component {
             - Set next button text to `Finish` if on last step, set to `Next` if not
 
         */
+
         document.getElementById(STEP_ID_LIST[this.state.wizard.currentStep - 1]).classList.remove('text-muted')
         document.getElementById(STEP_ID_LIST[this.state.wizard.currentStep - 1]).classList.add('text-success')
         document.getElementById(STEP_ID_LIST[this.state.wizard.prevStep - 1]).classList.remove('text-success')
@@ -201,6 +201,8 @@ class JoinOrg extends React.Component {
                 this.refs.nextBtn.innerText = "Next";
             }
         }
+        // When the user changes tabs, the component re-renders, and scrolls to top
+        ReactDOM.findDOMNode(this).scrollIntoView();
     }
 
     setStep(step) {
@@ -223,11 +225,11 @@ class JoinOrg extends React.Component {
         return(
             <div id="content" className="container-fluid animated fadeInDown">
                 <h3 className="text-center text-danger">Join Organization</h3><hr/><br/>
-                <div className="col-sm-8 col-sm-offset-2 col-xs-12 col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3" style={boxShadowStyle}>
+                <div className="col-sm-8 col-sm-offset-2 col-xs-12 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2" style={boxShadowStyle}>
                     <form className="smart-form" ref="form" id="form" noValidate="novalidate">
                         <fieldset>
                             <div className="text-center">
-                                <h5 className="col-xs-3 text-success" id="tab1" >CODE</h5>
+                                <h5 className="col-xs-3 text-success" id="tab1">CODE</h5>
                                 <h5 className="col-xs-3 text-muted" id="tab2">VERIFY</h5>
                                 <h5 className="col-xs-3 text-muted" id="tab3">MEMBER</h5>
                                 <h5 className="col-xs-3 text-muted" id="tab4">FINISH</h5>
@@ -242,10 +244,11 @@ class JoinOrg extends React.Component {
                                             return (
                                                 <div>
                                                     <h5><strong>Step 1 </strong> - Organization Code</h5>
-                                                    <br/><br/><p className="text-center">Enter your organization code below.</p><br/>
+                                                    <br/><br/>
+                                                    <p className="text-center">Enter your organization code below.</p><br/>
                                                     <section className="col-xs-12">
                                                         <label className="input">
-                                                            <input type="text" ref="orgCode" className="form-control" name="orgCode" placeholder="Organization Code"
+                                                            <input ref="orgCode" placeholder="Organization Code" defaultValue={this.state.organization.orgCode}
                                                                                         style={textfieldStyle}
                                                                                         onChange={this.onOrgCodeChange}/><br/>
                                                         </label>
@@ -257,22 +260,30 @@ class JoinOrg extends React.Component {
                                             return (
                                                 <div>
                                                     <h5><strong>Step 2 </strong> - Verify Information</h5>
-                                                    <br/><br/><p className="text-center">Verify that all information below is correct.</p><br/><hr/>
+                                                    <br/><br/>
+                                                    <p className="text-center">
+                                                        Verify that all information below is correct.
+                                                    </p><br/><hr/>
                                                     <section className="text-center">
-                                                        <br/><h1 className="text-danger">{this.state.organization.name}</h1><br/>
+                                                        <br/>
+                                                        <h1 className="text-danger">{this.state.organization.organization.name}</h1><br/>
                                                         <div>
-                                                            <img style={bigCirclePhotoStyle} src={this.state.organization.logoURL}/>
+                                                            <img style={bigCirclePhotoStyle} src={this.state.organization.organization.logoURL}/>
                                                         </div><br/>
                                                         <ul className="list-unstyled">
                                                             <li>
                                                                 <p className="text-primary">
-                                                                    <i className="fa fa-envelope" />&nbsp;&nbsp;<span>{this.state.organization.email}</span>
+                                                                    <i className="fa fa-envelope" />&nbsp;&nbsp;
+                                                                        <span>{this.state.organization.organization.email}</span>
                                                                 </p>
                                                             </li>
                                                             <li>
                                                                 <p className="text-muted">
-                                                                    <i className="fa fa-map-marker" />&nbsp;&nbsp;<span>{this.state.organization.physicalAddress.city +
-                                                                                                                        ", " + this.state.organization.physicalAddress.state}</span>
+                                                                    <i className="fa fa-map-marker" />&nbsp;&nbsp;
+                                                                        <span>
+                                                                        {this.state.organization.organization.physicalAddress.city +
+                                                                            ", " + this.state.organization.organization.physicalAddress.state}
+                                                                        </span>
                                                                 </p>
                                                             </li>
                                                         </ul>
@@ -303,9 +314,11 @@ class JoinOrg extends React.Component {
                                                     <h5><strong>Step 4 </strong> - Finish</h5>
                                                     <div className="row"><br/>
                                                         <h3 className="text-center text-success"><strong><i className="fa fa-check"/> Complete</strong></h3><br/>
-                                                        <h5 className="text-center">Information verified to join <strong>{this.state.organization.name}</strong></h5><br/>
+                                                        <h5 className="text-center">Information verified to join
+                                                            <strong>{" " + this.state.organization.organization.name}</strong>
+                                                        </h5><br/>
                                                         <div className="text-center">
-                                                            <div><img style={bigCirclePhotoStyle} src={this.state.organization.logoURL}/></div>
+                                                            <div><img style={bigCirclePhotoStyle} src={this.state.organization.organization.logoURL}/></div>
                                                         </div><br/>
                                                     </div>
                                                     <div className="row">
@@ -318,12 +331,10 @@ class JoinOrg extends React.Component {
                                     }
                                 })()
                             }
-                            <p className="text-center text-warning">
-                                {this.state.organization.orgStatusText}
-                            </p>
+                            <p className="text-center text-warning">{this.state.validationMessage}</p>
                         </fieldset>
                         <footer style={{backgroundColor: 'white'}}>
-                            <button type="submit" ref="nextBtn" onClick={this.onNextClicked} className="btn pull-right btn-success"
+                            <button ref="nextBtn" onClick={this.onNextClicked} className="btn pull-right btn-success"
                                                         style={{borderRadius: "10px"}}>Next</button>
                             <button ref="prevBtn" onClick={this.onPreviousClicked} className="btn btn-default pull-left"
                                                         style={{borderRadius: "10px"}}>Previous</button>
